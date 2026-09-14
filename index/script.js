@@ -27,25 +27,64 @@
         }
 
         /*
-         * 表示する文章。
-         *
-         * 「創造性が続くこと」だけ
-         * accent=true にする。
+         * URLから言語を検出。
          */
-        const messageParts = [
-          {
-            text: "終わりなく",
-            accent: false
-          },
-          {
-            text: "創造性が続くこと",
-            accent: true
-          },
-          {
-            text: "を願います",
-            accent: false
-          }
-        ];
+        function getLanguageFromURL() {
+          const path = window.location.pathname;
+          if (path.includes("/i/en/")) return "en";
+          if (path.includes("/i/zh/")) return "zh";
+          if (path.includes("/i/ru/")) return "ru";
+          if (path.includes("/i/hi/")) return "hi";
+          if (path.includes("/i/kr/") || path.includes("/i/kp/")) return "ko";
+          if (path.includes("/i/zh-tw/")) return "zh-TW";
+          return "ja";
+        }
+
+        const lang = getLanguageFromURL();
+
+        /*
+         * 言語別の表示文章。
+         * accent=true の部分が強調される。
+         */
+        const messages = {
+          ja: [
+            { text: "終わりなく", accent: false },
+            { text: "創造性が続くこと", accent: true },
+            { text: "を願います", accent: false }
+          ],
+          en: [
+            { text: "I hope", accent: false },
+            { text: "creativity continues endlessly", accent: true }
+            { text: ".", accent: false }
+          ],
+          zh: [
+            { text: "愿", accent: false },
+            { text: "创造力永无止境", accent: true }
+            { text: ".", accent: false }
+          ],
+          ru: [
+            { text: "Я надеюсь, что", accent: false },
+            { text: "творчество будет продолжаться бесконечно", accent: true }
+            { text: ".", accent: false }
+          ],
+          hi: [
+            { text: "अंतहीन", accent: false },
+            { text: "रचनात्मकता के निरंतर होने की कामना करता हूँ", accent: true }
+            { text: ".", accent: false }
+          ],
+          ko: [
+            { text: "끝없이", accent: false },
+            { text: "창의성이 이어지기를", accent: true },
+            { text: "바랍니다", accent: false }
+          ],
+          "zh-TW": [
+            { text: "願", accent: false },
+            { text: "創造力永無止境", accent: true },
+            { text: ".", accent: false }
+          ]
+        };
+
+        const messageParts = messages[lang] || messages.ja;
 
         const fragment =
           document.createDocumentFragment();
@@ -195,7 +234,7 @@
         }
 
         console.log(
-          `[NIDELE] Creative intro initialized. characters=${messageCharacters.length}`
+          `[NIDELE] Creative intro initialized. language=${lang}, characters=${messageCharacters.length}`
         );
 
         /*
