@@ -55,22 +55,18 @@
           en: [
             { text: "I hope", accent: false },
             { text: "creativity continues endlessly", accent: true }
-            { text: ".", accent: false }
           ],
           zh: [
             { text: "愿", accent: false },
             { text: "创造力永无止境", accent: true }
-            { text: ".", accent: false }
           ],
           ru: [
             { text: "Я надеюсь, что", accent: false },
             { text: "творчество будет продолжаться бесконечно", accent: true }
-            { text: ".", accent: false }
           ],
           hi: [
             { text: "अंतहीन", accent: false },
             { text: "रचनात्मकता के निरंतर होने की कामना करता हूँ", accent: true }
-            { text: ".", accent: false }
           ],
           ko: [
             { text: "끝없이", accent: false },
@@ -79,8 +75,7 @@
           ],
           "zh-TW": [
             { text: "願", accent: false },
-            { text: "創造力永無止境", accent: true },
-            { text: ".", accent: false }
+            { text: "創造力永無止境", accent: true }
           ]
         };
 
