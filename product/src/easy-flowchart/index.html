@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>簡単フローチャート — Mermaidベースのフローチャートエディタ</title>
+<meta name="description" content="Mermaidに対応したブラウザ上のフローチャートエディタ。ノードと矢印を直感的に編集し、MermaidコードやSVGとして保存・書き出しできます。">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a73e8">
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:title" content="簡単フローチャート — Mermaidベースのフローチャートエディタ">
+<meta property="og:description" content="ノードと矢印をドラッグして編集できる、軽量なMermaidベースのフローチャートエディタ。">
+<meta property="og:image" content="logo.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="簡単フローチャート — Mermaidベースのフローチャートエディタ">
+<meta name="twitter:description" content="ブラウザで使えるMermaidベースのフローチャートエディタ。">
+<link rel="icon" type="image/png" href="logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Mermaid Flowchart","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"Mermaidに対応したブラウザ上のフローチャートエディタ。","url":"./"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <img class="brand-logo" src="logo.png" alt="簡単フローチャート" width="40" height="40">
+      <div class="brand-copy">
+        <h1 class="title">簡単フローチャート<span style="background:#1a73e8;color:#fff;border-radius:8px;padding:2px 8px;font-weight:400;">Beta</span></h1>
+      </div>
+    </div>
+    <div id="status" class="status">準備中...</div>
+    <div class="top-actions">
+      <button class="icon-btn" id="undoBtn" title="元に戻す" aria-label="元に戻す"><span class="material-icons-round">undo</span></button>
+      <button class="icon-btn" id="redoBtn" title="やり直す" aria-label="やり直す"><span class="material-icons-round">redo</span></button>
+      <button class="icon-btn" id="previewBtn" title="Mermaidプレビュー" aria-label="Mermaidプレビュー"><span class="material-icons-round">play_arrow</span>SVG プレビュー</button>
+      <button class="icon-btn" id="exportBtn" title="SVGを書き出す" aria-label="SVGを書き出す"><span class="material-icons-round">download</span>ダウンロード</button>
+      <button class="icon-btn save-btn" id="saveBtn" title="保存" aria-label="保存"><span class="material-icons-round">save</span>保存</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <div id="canvas" class="canvas">
+      <div class="canvas-grid"></div>
+      <div id="diagram" class="diagram">
+        <svg id="edgesLayer" class="edges-layer"></svg>
+        <button id="selectionAction" class="selection-action" type="button" title="削除" aria-label="削除">
+          <span class="material-icons-round">delete</span>
+        </button>
+      </div>
+
+      <button id="addNodeBtn" class="fab" type="button" title="ノードを追加" aria-label="ノードを追加">
+        <span class="material-icons-round">add</span>
+        <span>ノードを追加</span>
+      </button>
+
+      <div class="zoom-info">
+        <button id="zoomOut" title="縮小" aria-label="縮小"><span class="material-icons-round">remove</span></button>
+        <div id="zoomValue" class="zoom-value">100%</div>
+        <button id="zoomIn" title="拡大" aria-label="拡大"><span class="material-icons-round">add</span></button>
+      </div>
+
+      <div id="minimap" class="minimap">
+        <svg></svg>
+      </div>
+
+      <div class="view-controls" aria-label="表示操作">
+        <button id="fitBtn" title="全体表示" aria-label="全体表示"><span class="material-icons-round">fit_screen</span></button>
+        <button id="resetViewBtn" title="表示をリセット" aria-label="表示をリセット"><span class="material-icons-round">center_focus_strong</span></button>
+      </div>
+
+      <div id="toast" class="toast"></div>
+
+      <div id="previewOverlay" class="preview-overlay">
+        <div class="preview-header">
+          <div class="preview-title">Mermaid Preview</div>
+          <button id="closePreview" class="secondary" type="button">
+            <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+            閉じる
+          </button>
+        </div>
+        <div class="preview-body">
+          <div id="previewContainer" class="preview-container"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="right-panel">
+    <div class="panel-tabs">
+      <button id="propertiesTab" class="panel-tab active" type="button">プロパティ</button>
+      <button id="codeTab" class="panel-tab" type="button">Mermaid (Beta)</button>
+    </div>
+
+    <div id="propertiesPanel" class="panel-content"></div>
+
+    <div id="codePanel" class="panel-content" style="display:none">
+      <div class="code-wrap">
+        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+        <div class="code-actions">
+          <button id="applyCode" class="primary" type="button">コードを反映</button>
+          <button id="copyCode" class="secondary" type="button">コピー</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+   <script src="https://nidele206.github.io/check.js?check=none"></script>
+
+<script type="module" src="app.js"></script>
+<noscript><p>Mermaidベースののブラウザ上フローチャートエディタです。ノードと矢印を編集し、MermaidコードやSVGとして書き出せます。</p></noscript>
+</body>
+</html>
