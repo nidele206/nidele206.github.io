@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>簡単フローチャート — Mermaidベースのフローチャートエディタ</title>
-<meta name="description" content="Mermaidに対応したブラウザ上のフローチャートエディタ。ノードと矢印を直感的に編集し、MermaidコードやSVGとして保存・書き出しできます。">
+<meta name="description" content="Mermaidに対応したブラウザ上のフローチャートエディタ。Welcomeとプロジェクトをタブで開き、プロジェクトをそのまま編集できます。">
 <meta name="robots" content="index,follow">
 <meta name="theme-color" content="#1a73e8">
 <link rel="canonical" href="./">
 <meta property="og:type" content="website">
 <meta property="og:title" content="簡単フローチャート — Mermaidベースのフローチャートエディタ">
-<meta property="og:description" content="ノードと矢印をドラッグして編集できる、軽量なMermaidベースのフローチャートエディタ。">
-<meta property="og:image" content="../src/easy-flowchart/icon.png">
+<meta property="og:description" content="Welcomeとプロジェクトをタブで開き、ノードと矢印を直感的に編集できるMermaidベースのフローチャートエディタ。">
+<meta property="og:image" content="icon.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="簡単フローチャート — Mermaidベースのフローチャートエディタ">
 <meta name="twitter:description" content="ブラウザで使えるMermaidベースのフローチャートエディタ。">
 <link rel="icon" type="image/png" href="../src/easy-flowchart/icon.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Mermaid Flowchart","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"Mermaidに対応したブラウザ上のフローチャートエディタ。","url":"./"}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"簡単フローチャート","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"Mermaidに対応したブラウザ上のフローチャートエディタ。","url":"./"}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
@@ -24,93 +24,150 @@
 </head>
 <body>
 <div class="app">
-  <header class="topbar">
-    <div class="brand">
-      <img class="brand-logo" src="../src/easy-flowchart/icon.png" alt="簡単フローチャート" width="40" height="40">
-      <div class="brand-copy">
-        <h1 class="title">簡単フローチャート<span style="background:#1a73e8;color:#fff;border-radius:8px;padding:2px 8px;font-weight:400;">Beta</span></h1>
-      </div>
-    </div>
-    <div id="status" class="status">準備中...</div>
-    <div class="top-actions">
-      <button class="icon-btn" id="undoBtn" title="元に戻す" aria-label="元に戻す"><span class="material-icons-round">undo</span></button>
-      <button class="icon-btn" id="redoBtn" title="やり直す" aria-label="やり直す"><span class="material-icons-round">redo</span></button>
-      <button class="icon-btn" id="previewBtn" title="Mermaidプレビュー" aria-label="Mermaidプレビュー"><span class="material-icons-round">play_arrow</span>SVG プレビュー</button>
-      <button class="icon-btn" id="exportBtn" title="SVGを書き出す" aria-label="SVGを書き出す"><span class="material-icons-round">download</span>ダウンロード</button>
-      <button class="icon-btn save-btn" id="saveBtn" title="保存" aria-label="保存"><span class="material-icons-round">save</span>保存</button>
-    </div>
+  <header class="topbar workspace-tabs-bar">
+    <div id="topTabs" class="top-tabs" role="tablist" aria-label="開いているタブ"></div>
+    <button id="newTopTabBtn" class="new-top-tab" type="button" title="新しいタブ" aria-label="新しいタブ">
+      <span class="material-icons-round">add</span>
+    </button>
   </header>
 
-  <main class="workspace">
-    <div id="canvas" class="canvas">
-      <div class="canvas-grid"></div>
-      <div id="diagram" class="diagram">
-        <svg id="edgesLayer" class="edges-layer"></svg>
-        <button id="selectionAction" class="selection-action" type="button" title="削除" aria-label="削除">
-          <span class="material-icons-round">delete</span>
-        </button>
-      </div>
-
-      <button id="addNodeBtn" class="fab" type="button" title="ノードを追加" aria-label="ノードを追加">
-        <span class="material-icons-round">add</span>
-        <span>ノードを追加</span>
+  <!-- Welcome自体が最上位タブの中身。ここからプロジェクトを開くと現在のWelcomeタブがプロジェクトタブへ変わる。 -->
+  <main id="welcomeView" class="welcome-view" hidden>
+    <section class="welcome-shell">
+      <img class="welcome-logo" src="../src/easy-flowchart/icon.png" alt="簡単フローチャート" width="96" height="96">
+      <div class="welcome-eyebrow">Nidele Series</div>
+      <h1>簡単フローチャート</h1>
+      <p>"新しいプロジェクト"から開始しましょう</p>
+      <button id="createProjectBtn" class="primary welcome-create" type="button">
+        <span class="material-icons-round">add</span>新しいプロジェクト
       </button>
-
-      <div class="zoom-info">
-        <button id="zoomOut" title="縮小" aria-label="縮小"><span class="material-icons-round">remove</span></button>
-        <div id="zoomValue" class="zoom-value">100%</div>
-        <button id="zoomIn" title="拡大" aria-label="拡大"><span class="material-icons-round">add</span></button>
-      </div>
-
-      <div id="minimap" class="minimap">
-        <svg></svg>
-      </div>
-
-      <div class="view-controls" aria-label="表示操作">
-        <button id="fitBtn" title="全体表示" aria-label="全体表示"><span class="material-icons-round">fit_screen</span></button>
-        <button id="resetViewBtn" title="表示をリセット" aria-label="表示をリセット"><span class="material-icons-round">center_focus_strong</span></button>
-      </div>
-
-      <div id="toast" class="toast"></div>
-
-      <div id="previewOverlay" class="preview-overlay">
-        <div class="preview-header">
-          <div class="preview-title">Mermaid Preview</div>
-          <button id="closePreview" class="secondary" type="button">
-            <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
-            閉じる
-          </button>
-        </div>
-        <div class="preview-body">
-          <div id="previewContainer" class="preview-container"></div>
+    </section>
+    <section class="project-section" aria-labelledby="projectSectionTitle">
+      <div class="project-section-head">
+        <div>
+          <h2 id="projectSectionTitle">プロジェクト</h2>
         </div>
       </div>
-    </div>
+      <div id="projectGrid" class="project-grid"></div>
+      <div id="projectEmpty" class="project-empty" hidden>
+        <span class="material-icons-round">folder_open</span>
+        <strong>まだプロジェクトがありません</strong>
+        <p>「新しいプロジェクト」から作成できます。</p>
+      </div>
+    </section>
   </main>
 
-  <aside class="right-panel">
-    <div class="panel-tabs">
-      <button id="propertiesTab" class="panel-tab active" type="button">プロパティ</button>
-      <button id="codeTab" class="panel-tab" type="button">Mermaid (Beta)</button>
-    </div>
+  <!-- プロジェクトタブの中身。プロジェクトは1つの編集ドキュメントで、内部にファイルタブは持たない。 -->
+  <section id="editorView" class="editor-view" hidden>
+    <header class="topbar project-toolbar">
+      <div id="status" class="status">準備中...</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="renameBtn" title="名前を変更" aria-label="名前を変更"><span class="material-icons-round">edit</span>名前を変更</button>
+        <button class="icon-btn" id="undoBtn" title="元に戻す" aria-label="元に戻す"><span class="material-icons-round">undo</span></button>
+        <button class="icon-btn" id="redoBtn" title="やり直す" aria-label="やり直す"><span class="material-icons-round">redo</span></button>
+        <button class="icon-btn" id="previewBtn" title="Mermaidプレビュー" aria-label="Mermaidプレビュー"><span class="material-icons-round">play_arrow</span>SVG プレビュー</button>
+        <button class="icon-btn" id="exportBtn" title="SVGを書き出す" aria-label="SVGを書き出す"><span class="material-icons-round">download</span>ダウンロード</button>
+        <button class="icon-btn save-btn" id="saveBtn" title="手動保存" aria-label="手動保存"><span class="material-icons-round">save</span>手動保存</button>
+      </div>
+    </header>
 
-    <div id="propertiesPanel" class="panel-content"></div>
+    <main class="workspace">
+      <div id="canvas" class="canvas">
+        <div class="canvas-grid"></div>
+        <div id="diagram" class="diagram">
+          <svg id="edgesLayer" class="edges-layer"></svg>
+          <button id="selectionAction" class="selection-action" type="button" title="削除" aria-label="削除">
+            <span class="material-icons-round">delete</span>
+          </button>
+        </div>
 
-    <div id="codePanel" class="panel-content" style="display:none">
-      <div class="code-wrap">
-        <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
-        <div class="code-actions">
-          <button id="applyCode" class="primary" type="button">コードを反映</button>
-          <button id="copyCode" class="secondary" type="button">コピー</button>
+        <button id="addNodeBtn" class="fab" type="button" title="ノードを追加" aria-label="ノードを追加">
+          <span class="material-icons-round">add</span>
+          <span>ノードを追加</span>
+        </button>
+
+        <div class="zoom-info">
+          <button id="zoomOut" title="縮小" aria-label="縮小"><span class="material-icons-round">remove</span></button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button id="zoomIn" title="拡大" aria-label="拡大"><span class="material-icons-round">add</span></button>
+        </div>
+
+        <div id="minimap" class="minimap"><svg></svg></div>
+
+        <div class="view-controls" aria-label="表示操作">
+          <button id="fitBtn" title="全体表示" aria-label="全体表示"><span class="material-icons-round">fit_screen</span></button>
+          <button id="resetViewBtn" title="表示をリセット" aria-label="表示をリセット"><span class="material-icons-round">center_focus_strong</span></button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <div id="previewOverlay" class="preview-overlay">
+          <div class="preview-header">
+            <div class="preview-title">Mermaid Preview</div>
+            <button id="closePreview" class="secondary" type="button">
+              <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+              閉じる
+            </button>
+          </div>
+          <div class="preview-body"><div id="previewContainer" class="preview-container"></div></div>
         </div>
       </div>
-    </div>
-  </aside>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button id="propertiesTab" class="panel-tab active" type="button">プロパティ</button>
+        <button id="codeTab" class="panel-tab" type="button">Mermaid (Beta)</button>
+      </div>
+      <div id="propertiesPanel" class="panel-content"></div>
+      <div id="codePanel" class="panel-content" style="display:none">
+        <div class="code-wrap">
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+          <div class="code-actions">
+            <button id="applyCode" class="primary" type="button">コードを反映</button>
+            <button id="copyCode" class="secondary" type="button">コピー</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
 </div>
-
-   <script src="https://nidele206.github.io/check.js?check=none"></script>
-
+<script src="https://nidele206.github.io/check.js?check=none"></script>
+<script>
+window.STRINGS={
+  shapeRect:"四角",shapeRound:"角丸",shapeStadium:"ピル",shapeDiamond:"ひし形",
+  edgeArrow:"矢印",edgeLine:"線",edgeDotted:"点線",edgeThick:"太線",edgeCircle:"円",edgeCross:"×",
+  newNode:"新しいノード",nodeDeleted:"ノードを削除しました",edgeDeleted:"接続を削除しました",
+  selectExistingNode:"存在するノードを選択してください",duplicateId:"そのIDは既に使用されています",
+  invalidPosition:"位置には数値を入力してください",duplicateEdge:"同じ接続は既にあります",
+  unsupportedShapes:"このエディタで使用できる形状は、四角・角丸・ピル・ひし形のみです。",
+  dragToConnect:"ドラッグして接続",noNodesToDisplay:"表示できるノードがありません",
+  renderingMermaid:"Mermaidをレンダリング中...",svgPreviewElementFailed:"SVGプレビュー用要素の生成に失敗しました",
+  svgDownloadElementFailed:"SVGダウンロード要素の生成に失敗しました",svgOutputError:"SVG出力エラー",
+  codeIsEmpty:"コードが空です",codeApplied:"コードを反映しました（重なりを回避）",
+  mermaidSyntaxError:"Mermaid構文エラー",indexedDBNotSupported:"このブラウザではIndexedDBが利用できません",
+  untitledProject:"無題のプロジェクト",renameProjectTitle:"名前を変更",renameProjectAria:"プロジェクト名を変更",
+  deleteProjectTitle:"削除",deleteProjectAria:"プロジェクトを削除",closeTabTitle:"タブを閉じる",
+  closeTabAria:"タブを閉じる",saveError:"保存エラー",autoSaveError:"自動保存エラー",
+  projectNamePrompt:"プロジェクトの名前",newProjectPrompt:"新しいプロジェクト",enterName:"名前を入力してください",
+  nodeCopied:"ノードをコピーしました",connectionCopied:"接続をコピーしました",
+  selectElementToCopy:"コピーする要素を選択してください",noCopiedElement:"コピーした要素がありません",
+  noTargetNode:"接続先のノードがありません",initError:"初期化エラー",saved:"保存しました",
+  svgExported:"SVGを書き出しました",svgExportFailed:"SVGを書き出せませんでした",
+  mermaidSvgEmpty:"MermaidのSVG生成結果が空です",mermaidSvgNotFound:"Mermaid SVG要素が見つかりません",
+  parsingMermaid:"Mermaidを解析中...",positionHint:"位置はキャンバス上でドラッグできます。サイズは内容に合わせて自動調整します。",
+  edgeLabelSyntaxHint:"ラベル付き矢印はMermaidの正規構文 <code>--&gt;|ラベル|</code> で生成します。",
+  connectionHint:"ノードの上下左右にある接続ポイントからドラッグすると、線をプレビューしながら接続できます。",
+  selectNodeOrEdge:"ノードまたは接続を選択すると",editProperties:"プロパティを編集できます。",
+  appName:"Nidele 簡単フローチャート",initializingMermaid:"Mermaidを初期化中...",
+  initializingIndexedDB:"IndexedDBを初期化中...",projectCount:"プロジェクト",nodesEdgesCount:"ノード / 接続",
+  deleteConfirm:"を削除しますか？",importStart:"ノードをクリック",importProcess:"上下左右の点をドラッグ",
+  importEnd:"接続可能",undo:"元に戻しました",redo:"やり直しました",
+  label:"ラベル",shape:"形状",direction:"方向",startNode:"開始ノード",endNode:"終了ノード",type:"種類",
+  nodeAdded:"ノードを追加しました",connectionComplete:"接続しました",connectionCanceled:"接続をキャンセルしました"
+};
+</script>
 <script type="module" src="../src/easy-flowchart/app.js"></script>
-<noscript><p>Mermaidベースののブラウザ上フローチャートエディタです。ノードと矢印を編集し、MermaidコードやSVGとして書き出せます。</p></noscript>
+<noscript><p>Mermaidベースのブラウザ上フローチャートエディタです。JavaScriptを有効にするとWelcomeとプロジェクトをタブで開けます。</p></noscript>
 </body>
 </html>

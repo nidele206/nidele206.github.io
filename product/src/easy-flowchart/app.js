@@ -3,38 +3,28 @@ import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@12/dist/mermaid.esm.mi
 const $ = id => document.getElementById(id);
 
 const els = {
-  canvas:$("canvas"),
-  diagram:$("diagram"),
-  edgesLayer:$("edgesLayer"),
-  properties:$("propertiesPanel"),
-  codePanel:$("codePanel"),
-  propertiesPanel:$("propertiesPanel"),
-  codeEditor:$("codeEditor"),
-  status:$("status"),
-  toast:$("toast"),
-  minimap:$("minimap"),
-  zoomValue:$("zoomValue"),
-  previewOverlay:$("previewOverlay"),
-  previewContainer:$("previewContainer"),
-  selectionAction:$("selectionAction"),
-  undoBtn:$("undoBtn"),
-  redoBtn:$("redoBtn"),
-  addNodeBtn:$("addNodeBtn"),
-  fitBtn:$("fitBtn"),
-  resetViewBtn:$("resetViewBtn"),
-  saveBtn:$("saveBtn"),
-  previewBtn:$("previewBtn"),
-  closePreview:$("closePreview"),
-  exportBtn:$("exportBtn"),
-  applyCode:$("applyCode"),
-  copyCode:$("copyCode"),
-  zoomIn:$("zoomIn"),
-  zoomOut:$("zoomOut"),
-  propertiesTab:$("propertiesTab"),
-  codeTab:$("codeTab")
+  canvas:$('canvas'), diagram:$('diagram'), edgesLayer:$('edgesLayer'),
+  properties:$('propertiesPanel'), codePanel:$('codePanel'), propertiesPanel:$('propertiesPanel'),
+  codeEditor:$('codeEditor'), status:$('status'), toast:$('toast'), minimap:$('minimap'),
+  zoomValue:$('zoomValue'), previewOverlay:$('previewOverlay'), previewContainer:$('previewContainer'),
+  selectionAction:$('selectionAction'), undoBtn:$('undoBtn'), redoBtn:$('redoBtn'), addNodeBtn:$('addNodeBtn'),
+  fitBtn:$('fitBtn'), resetViewBtn:$('resetViewBtn'), saveBtn:$('saveBtn'), previewBtn:$('previewBtn'),
+  closePreview:$('closePreview'), exportBtn:$('exportBtn'), applyCode:$('applyCode'), copyCode:$('copyCode'),
+  zoomIn:$('zoomIn'), zoomOut:$('zoomOut'), propertiesTab:$('propertiesTab'), codeTab:$('codeTab'),
+  welcomeView:$('welcomeView'), editorView:$('editorView'), topTabs:$('topTabs'), newTopTabBtn:$('newTopTabBtn'),
+  projectGrid:$('projectGrid'), projectEmpty:$('projectEmpty'), createProjectBtn:$('createProjectBtn'),
+  renameBtn:$('renameBtn')
 };
 
-const STORAGE_KEY = "mermaid-flowchart-editor-v4";
+const DB_NAME = 'easy-flowchart-workspace-v2';
+const DB_VERSION = 3;
+const PROJECT_STORE = 'projects';
+const LEGACY_FILE_STORE = 'files';
+
+const workspaceState = {
+  db:null, projects:[], tabs:[], activeTabId:null, activeProjectId:null,
+  saveTimer:null, saveQueue:Promise.resolve(), initialized:false
+};
 
 const state = {
   direction:"TD",
@@ -56,21 +46,102 @@ const state = {
   clipboard:null,
   suppressNextClick:false
 };
+const STRINGS = {
+  shapeRect:"四角",
+  shapeRound:"角丸",
+  shapeStadium:"ピル",
+  shapeDiamond:"ひし形",
+  edgeArrow:"矢印",
+  edgeLine:"線",
+  edgeDotted:"点線",
+  edgeThick:"太線",
+  edgeCircle:"円",
+  edgeCross:"×",
+  newNode:"新しいノード",
+  nodeDeleted:"ノードを削除しました",
+  edgeDeleted:"接続を削除しました",
+  selectExistingNode:"存在するノードを選択してください",
+  duplicateId:"そのIDは既に使用されています",
+  invalidPosition:"位置には数値を入力してください",
+  duplicateEdge:"同じ接続は既にあります",
+  unsupportedShapes:"このエディタで使用できる形状は、四角・角丸・ピル・ひし形のみです。",
+  dragToConnect:"ドラッグして接続",
+  noNodesToDisplay:"表示できるノードがありません",
+  renderingMermaid:"Mermaidをレンダリング中...",
+  svgPreviewElementFailed:"SVGプレビュー用要素の生成に失敗しました",
+  svgDownloadElementFailed:"SVGダウンロード要素の生成に失敗しました",
+  svgOutputError:"SVG出力エラー",
+  codeIsEmpty:"コードが空です",
+  codeApplied:"コードを反映しました（重なりを回避）",
+  mermaidSyntaxError:"Mermaid構文エラー",
+  indexedDBNotSupported:"このブラウザではIndexedDBが利用できません",
+  untitledProject:"無題のプロジェクト",
+  renameProjectTitle:"名前を変更",
+  renameProjectAria:"プロジェクト名を変更",
+  deleteProjectTitle:"削除",
+  deleteProjectAria:"プロジェクトを削除",
+  closeTabTitle:"タブを閉じる",
+  closeTabAria:"タブを閉じる",
+  saveError:"保存エラー",
+  autoSaveError:"自動保存エラー",
+  projectNamePrompt:"プロジェクトの名前",
+  newProjectPrompt:"新しいプロジェクト",
+  enterName:"名前を入力してください",
+  nodeCopied:"ノードをコピーしました",
+  connectionCopied:"接続をコピーしました",
+  selectElementToCopy:"コピーする要素を選択してください",
+  noCopiedElement:"コピーした要素がありません",
+  noTargetNode:"接続先のノードがありません",
+  initError:"初期化エラー",
+  saved:"保存しました",
+  svgExported:"SVGを書き出しました",
+  svgExportFailed:"SVGを書き出せませんでした",
+  mermaidSvgEmpty:"MermaidのSVG生成結果が空です",
+  mermaidSvgNotFound:"Mermaid SVG要素が見つかりません",
+  parsingMermaid:"Mermaidを解析中...",
+  positionHint:"位置はキャンバス上でドラッグできます。サイズは内容に合わせて自動調整します。",
+  edgeLabelSyntaxHint:"ラベル付き矢印はMermaidの正規構文 <code>--&gt;|ラベル|</code> で生成します。",
+  connectionHint:"ノードの上下左右にある接続ポイントからドラッグすると、線をプレビューしながら接続できます。",
+  selectNodeOrEdge:"ノードまたは接続を選択すると",
+  editProperties:"プロパティを編集できます。",
+  appName:"Nidele 簡単フローチャート",
+  initializingMermaid:"Mermaidを初期化中...",
+  initializingIndexedDB:"IndexedDBを初期化中...",
+  projectCount:"プロジェクト",
+  nodesEdgesCount:"ノード / 接続",
+  deleteConfirm:"を削除しますか？",
+  importStart:"ノードをクリック",
+  importProcess:"上下左右の点をドラッグ",
+  importEnd:"接続可能",
+  undo:"元に戻しました",
+  redo:"やり直しました",
+  label:"ラベル",
+  shape:"形状",
+  direction:"方向",
+  startNode:"開始ノード",
+  endNode:"終了ノード",
+  type:"種類",
+  nodeAdded:"ノードを追加しました",
+  connectionComplete:"接続しました",
+  connectionCanceled:"接続をキャンセルしました",
+};
+
+
 
 const NODE_SHAPES = [
-  ["rect","四角"],
-  ["round","角丸"],
-  ["stadium","ピル"],
-  ["diamond","ひし形"]
+  ["rect",STRINGS.shapeRect],
+  ["round",STRINGS.shapeRound],
+  ["stadium",STRINGS.shapeStadium],
+  ["diamond",STRINGS.shapeDiamond]
 ];
 
 const EDGE_TYPES = [
-  ["arrow","矢印"],
-  ["line","線"],
-  ["dotted","点線"],
-  ["thick","太線"],
-  ["circle","円"],
-  ["cross","×"]
+  ["arrow",STRINGS.edgeArrow],
+  ["line",STRINGS.edgeLine],
+  ["dotted",STRINGS.edgeDotted],
+  ["thick",STRINGS.edgeThick],
+  ["circle",STRINGS.edgeCircle],
+  ["cross",STRINGS.edgeCross]
 ];
 
 mermaid.initialize({
@@ -122,7 +193,7 @@ function toast(text){
   // Connection completion/cancellation and node-addition notices are intentionally
   // silent. They interrupt editing without adding useful information. Keep them in
   // the console for diagnostics instead of showing a user-facing toast.
-  if(/^(?:接続しました|接続をキャンセルしました|ノードを追加しました)$/.test(message)){
+  if(new RegExp("^(?:"+STRINGS.connectionComplete+"|"+STRINGS.connectionCanceled+"|"+STRINGS.nodeAdded+")$").test(message)){
     log("toast suppressed",message);
     return;
   }
@@ -300,7 +371,7 @@ function undo(){
   }
   state.historyIndex--;
   restoreGraph(state.history[state.historyIndex]);
-  toast("元に戻しました");
+  toast(STRINGS.undo);
   log("undo");
 }
 
@@ -311,7 +382,7 @@ function redo(){
   }
   state.historyIndex++;
   restoreGraph(state.history[state.historyIndex]);
-  toast("やり直しました");
+  toast(STRINGS.redo);
   log("redo");
 }
 
@@ -404,6 +475,43 @@ function normalizeNodeSize(node,size){
     width:Math.max(120,Math.round(size.width)),
     height:Math.max(52,Math.round(size.height))
   };
+}
+
+function blankGraph(){
+  return {direction:"TD",nodes:[],edges:[],extra:[],offsetX:300,offsetY:180,zoom:1,code:"flowchart TD"};
+}
+
+function normalizeGraphData(data){
+  const source=data&&typeof data==="object"?data:{};
+  state.direction=["TB","TD","BT","RL","LR"].includes(source.direction)?source.direction:"TD";
+  state.nodes=Array.isArray(source.nodes)?source.nodes:[];
+  state.edges=Array.isArray(source.edges)?source.edges:[];
+  state.extra=Array.isArray(source.extra)?source.extra:[];
+  state.offsetX=Number.isFinite(source.offsetX)?source.offsetX:300;
+  state.offsetY=Number.isFinite(source.offsetY)?source.offsetY:180;
+  state.zoom=Number.isFinite(source.zoom)&&source.zoom>0?source.zoom:1;
+  state.code=typeof source.code==="string"&&source.code.trim()?source.code:graphToMermaid();
+  for(const node of state.nodes){
+    if(!node||typeof node!=="object") continue;
+    node.id=String(node.id??uid("N"));
+    node.label=String(node.label??node.id);
+    node.shape=NODE_SHAPES.some(([value])=>value===node.shape)?node.shape:"rect";
+    const size=normalizeNodeSize(node,estimateNodeSize(node.label));
+    node.width=Number.isFinite(node.width)&&node.width>0?node.width:size.width;
+    node.height=Number.isFinite(node.height)&&node.height>0?node.height:size.height;
+    node.x=Number.isFinite(node.x)?node.x:0;
+    node.y=Number.isFinite(node.y)?node.y:0;
+    if(node.shape==="diamond"){node.width=size.width;node.height=size.height;}
+  }
+  state.edges=state.edges.filter(edge=>edge&&getNode(edge.from)&&getNode(edge.to)).map(edge=>({
+    ...edge,
+    id:String(edge.id??uid("E")),
+    from:String(edge.from),
+    to:String(edge.to),
+    type:EDGE_TYPES.some(([value])=>value===edge.type)?edge.type:"arrow",
+    label:String(edge.label??"")
+  }));
+  log("Graph normalized",{nodes:state.nodes.length,edges:state.edges.length});
 }
 
 function resizeNodeToLabel(node){
@@ -555,7 +663,7 @@ function findFreeNodePosition(width,height){
 
 function createNode(){
   const id=uniqueNodeId("N");
-  const template={shape:"rect",label:"新しいノード"};
+  const template={shape:"rect",label:STRINGS.newNode};
   const size=normalizeNodeSize(template,estimateNodeSize(template.label));
   const position=findFreeNodePosition(size.width,size.height);
   if(position.full){
@@ -565,7 +673,7 @@ function createNode(){
 
   const node={
     id,
-    label:"新しいノード",
+    label:STRINGS.newNode,
     shape:"rect",
     x:position.x,
     y:position.y,
@@ -597,7 +705,7 @@ function removeSelected(){
     state.selectedNode=null;
     pushHistory();
     renderAll();
-    toast("ノードを削除しました");
+    toast(STRINGS.nodeDeleted);
     log("node deleted",id);
     return;
   }
@@ -616,7 +724,7 @@ function removeSelected(){
     state.selectedEdge=null;
     pushHistory();
     renderAll();
-    toast("接続を削除しました");
+    toast(STRINGS.edgeDeleted);
     log("edge deleted",id);
   }
 }
@@ -695,7 +803,7 @@ function updateNode(id,key,value){
     }
 
     if(getNode(next)){
-      toast("そのIDは既に使用されています");
+      toast(STRINGS.duplicateId);
       renderProperties();
       warn("duplicate node id",next);
       return;
@@ -721,7 +829,7 @@ function updateNode(id,key,value){
   }else if(key==="x" || key==="y"){
     const number=Number(value);
     if(!Number.isFinite(number)){
-      toast("位置には数値を入力してください");
+      toast(STRINGS.invalidPosition);
       renderProperties();
       warn("invalid position",value);
       return;
@@ -746,7 +854,7 @@ function updateEdge(id,key,value){
 
   if(key==="from" || key==="to"){
     if(!getNode(value)){
-      toast("存在するノードを選択してください");
+      toast(STRINGS.selectExistingNode);
       renderProperties();
       warn("edge endpoint not found",value);
       return;
@@ -781,7 +889,7 @@ function addEdge(from,to,type="arrow",label=""){
 
   if(exists){
     warn("duplicate edge skipped",from,to);
-    toast("同じ接続は既にあります");
+    toast(STRINGS.duplicateEdge);
     return false;
   }
 
@@ -1230,7 +1338,7 @@ async function parseMermaidSource(source){
   const normalized=normalizeEditorMermaidSyntax(source);
   const valid=await mermaid.parse(normalized,{suppressErrors:false});
   if(!valid){
-    throw new Error("Mermaid構文が無効です");
+    throw new Error(STRINGS.mermaidInvalid);
   }
 
   const lines=normalized.replace(/\r/g,"").split("\n");
@@ -1317,7 +1425,7 @@ async function parseMermaidSource(source){
   if(unsupportedShapes.length){
     throw new Error(
       `未対応のノード形状があります: ${[...new Set(unsupportedShapes)].join(", ")}\n`+
-      "このエディタで使用できる形状は、四角・角丸・ピル・ひし形のみです。"
+      STRINGS.unsupportedShapes
     );
   }
 
@@ -1367,7 +1475,7 @@ function renderNodes(){
       const handle=document.createElement("div");
       handle.className=`handle ${side}`;
       handle.dataset.side=side;
-      handle.title="ドラッグして接続";
+      handle.title=STRINGS.dragToConnect;
       el.appendChild(handle);
     }
 
@@ -2333,23 +2441,23 @@ function renderProperties(){
           <input id="propNodeId" value="${htmlAttr(n.id)}">
         </div>
         <div class="field">
-          <label>ラベル</label>
+          <label>${STRINGS.label}</label>
           <textarea id="propNodeLabel">${htmlText(n.label)}</textarea>
         </div>
         <div class="field">
-          <label>形状</label>
+          <label>${STRINGS.shape}</label>
           <select id="propNodeShape">
             ${NODE_SHAPES.map(([v,l])=>
               `<option value="${v}" ${n.shape===v?"selected":""}>${l}</option>`
             ).join("")}
           </select>
         </div>
-        <div class="hint">位置はキャンバス上でドラッグできます。サイズは内容に合わせて自動調整します。</div>
+        <div class="hint">${STRINGS.positionHint}</div>
       </div>
       <div class="panel-section">
         <div class="section-title">Flowchart</div>
         <div class="field">
-          <label>方向</label>
+          <label>${STRINGS.direction}</label>
           <select id="direction">
             ${directionOptionsHtml()}
           </select>
@@ -2374,7 +2482,7 @@ function renderProperties(){
       <div class="panel-section">
         <div class="section-title">Edge</div>
         <div class="field">
-          <label>開始ノード</label>
+          <label>${STRINGS.startNode}</label>
           <select id="propEdgeFrom">
             ${state.nodes.map(n=>
               `<option value="${htmlAttr(n.id)}" ${n.id===e.from?"selected":""}>${htmlText(n.id)}</option>`
@@ -2382,7 +2490,7 @@ function renderProperties(){
           </select>
         </div>
         <div class="field">
-          <label>終了ノード</label>
+          <label>${STRINGS.endNode}</label>
           <select id="propEdgeTo">
             ${state.nodes.map(n=>
               `<option value="${htmlAttr(n.id)}" ${n.id===e.to?"selected":""}>${htmlText(n.id)}</option>`
@@ -2390,7 +2498,7 @@ function renderProperties(){
           </select>
         </div>
         <div class="field">
-          <label>種類</label>
+          <label>${STRINGS.type}</label>
           <select id="propEdgeType">
             ${EDGE_TYPES.map(([v,l])=>
               `<option value="${v}" ${e.type===v?"selected":""}>${l}</option>`
@@ -2398,15 +2506,15 @@ function renderProperties(){
           </select>
         </div>
         <div class="field">
-          <label>ラベル</label>
+          <label>${STRINGS.label}</label>
           <input id="propEdgeLabel" value="${htmlAttr(e.label||"")}">
         </div>
-        <div class="hint">ラベル付き矢印はMermaidの正規構文 <code>--&gt;|ラベル|</code> で生成します。</div>
+        <div class="hint">${STRINGS.edgeLabelSyntaxHint}</div>
       </div>
       <div class="panel-section">
         <div class="section-title">Flowchart</div>
         <div class="field">
-          <label>方向</label>
+          <label>${STRINGS.direction}</label>
           <select id="direction">
             ${directionOptionsHtml()}
           </select>
@@ -2422,16 +2530,16 @@ function renderProperties(){
     <div class="panel-section">
       <div class="section-title">Flowchart</div>
       <div class="field">
-        <label>方向</label>
+        <label>${STRINGS.direction}</label>
         <select id="direction">
           ${directionOptionsHtml()}
         </select>
       </div>
-      <div class="hint">ノードの上下左右にある接続ポイントからドラッグすると、線をプレビューしながら接続できます。</div>
+      <div class="hint">${STRINGS.connectionHint}</div>
     </div>
     <div class="empty">
-      ノードまたは接続を選択すると<br>
-      プロパティを編集できます。
+      ${STRINGS.selectNodeOrEdge}<br>
+      ${STRINGS.editProperties}
     </div>
   `;
 
@@ -2640,7 +2748,7 @@ function resetView(){
 function fitView(){
   if(!state.nodes.length){
     resetView();
-    toast("表示できるノードがありません");
+    toast(STRINGS.noNodesToDisplay);
     return;
   }
 
@@ -2713,7 +2821,7 @@ function renderAll(){
   applyTransform();
   updateHistoryButtons();
 
-  setStatus(`${state.nodes.length} ノード / ${state.edges.length} 接続`);
+  setStatus(`${state.nodes.length} ${STRINGS.nodesEdgesCount} ${state.edges.length}`);
   saveLocal();
   log("renderAll complete");
 }
@@ -2732,27 +2840,27 @@ function showPreviewError(error){
 async function showPreview(){
   const source=graphToMermaid();
   try{
-    setStatus("Mermaidをレンダリング中...");
+    setStatus(STRINGS.renderingMermaid);
     await mermaid.parse(source,{suppressErrors:false});
     const id=`mermaidPreview${++state.previewId}`;
     const result=await mermaid.render(id,source);
-    if(!result?.svg) throw new Error("MermaidのSVG生成結果が空です");
+    if(!result?.svg) throw new Error(STRINGS.mermaidSvgEmpty);
 
     const wrapper=document.createElement("div");
     if(!wrapper){
-      throw new Error("SVGプレビュー用要素の生成に失敗しました");
+      throw new Error(STRINGS.svgPreviewElementFailed);
     }
     wrapper.innerHTML=result.svg;
     const svg=wrapper.querySelector("svg");
     if(!svg){
-      throw new Error("Mermaid SVG要素が見つかりません");
+      throw new Error(STRINGS.mermaidSvgNotFound);
     }
 
     applySvgVisualStyle(svg,false);
     els.previewContainer.innerHTML="";
     els.previewContainer.appendChild(svg);
     els.previewOverlay.classList.add("open");
-    setStatus(`${state.nodes.length} ノード / ${state.edges.length} 接続`);
+    setStatus(`${state.nodes.length} ${STRINGS.nodesEdgesCount} ${state.edges.length}`);
     log("Mermaid rendered successfully with native routing");
   }catch(error){
     errorLog("Render error:",error);
@@ -2767,7 +2875,7 @@ function applySvgVisualStyle(svg,includeWatermark){
   }
 
   svg.setAttribute("role","img");
-  svg.setAttribute("aria-label","Nidele 簡単フローチャート");
+  svg.setAttribute("aria-label",STRINGS.appName);
 
   const style=document.createElementNS("http://www.w3.org/2000/svg","style");
   style.textContent=`
@@ -2807,7 +2915,7 @@ function applySvgVisualStyle(svg,includeWatermark){
     watermark.setAttribute("font-size","12");
     watermark.setAttribute("fill","#7f8995");
     watermark.setAttribute("opacity","0.72");
-    watermark.textContent="Nidele 簡単フローチャート";
+    watermark.textContent=STRINGS.appName;
     svg.appendChild(watermark);
     log("SVG watermark added");
   }
@@ -2817,14 +2925,14 @@ function exportSvg(){
   try{
     const source=graphToMermaid();
     const renderId=`mermaidExport${++state.previewId}`;
-    setStatus("SVGを書き出し中...");
+    setStatus(STRINGS.parsingMermaid);
     mermaid.parse(source,{suppressErrors:false}).then(async()=>{
       const result=await mermaid.render(renderId,source);
-      if(!result?.svg) throw new Error("MermaidのSVG生成結果が空です");
+      if(!result?.svg) throw new Error(STRINGS.mermaidSvgEmpty);
       const wrapper=document.createElement("div");
       wrapper.innerHTML=result.svg;
       const svg=wrapper.querySelector("svg");
-      if(!svg) throw new Error("Mermaid SVG要素が見つかりません");
+      if(!svg) throw new Error(STRINGS.mermaidSvgNotFound);
       applySvgVisualStyle(svg,true);
 
       const serialized=new XMLSerializer().serializeToString(svg);
@@ -2833,7 +2941,7 @@ function exportSvg(){
       const a=document.createElement("a");
       if(!a){
         URL.revokeObjectURL(url);
-        throw new Error("SVGダウンロード要素の生成に失敗しました");
+        throw new Error(STRINGS.svgDownloadElementFailed);
       }
       a.href=url;
       a.download="nidele-flowchart.svg";
@@ -2841,18 +2949,18 @@ function exportSvg(){
       a.click();
       a.remove();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
-      setStatus(`${state.nodes.length} ノード / ${state.edges.length} 接続`);
-      toast("SVGを書き出しました");
+      setStatus(`${state.nodes.length} ${STRINGS.nodesEdgesCount} ${state.edges.length}`);
+      toast(STRINGS.svgExported);
       log("SVG exported with Mermaid native routing and watermark");
     }).catch(error=>{
       errorLog("SVG export render error:",error);
-      toast("SVGを書き出せませんでした");
-      setStatus("SVG出力エラー",true);
+      toast(STRINGS.svgExportFailed);
+      setStatus(STRINGS.svgOutputError,true);
     });
   }catch(error){
     errorLog("SVG export error:",error);
-    toast("SVGを書き出せませんでした");
-    setStatus("SVG出力エラー",true);
+    toast(STRINGS.svgExportFailed);
+    setStatus(STRINGS.svgOutputError,true);
   }
 }
 
@@ -2865,13 +2973,13 @@ async function applyCode(){
   const source=els.codeEditor.value.trim();
 
   if(!source){
-    toast("コードが空です");
+    toast(STRINGS.codeIsEmpty);
     warn("empty Mermaid source");
     return;
   }
 
   try{
-    setStatus("Mermaidを解析中...");
+    setStatus(STRINGS.parsingMermaid);
 
     const parsed=await parseMermaidSource(source);
 
@@ -2887,7 +2995,7 @@ async function applyCode(){
     pushHistory();
     renderAll();
 
-    toast("コードを反映しました（重なりを回避）");
+    toast(STRINGS.codeApplied);
     log("Mermaid parsed successfully",{
       nodes:state.nodes.length,
       edges:state.edges.length,
@@ -2895,65 +3003,476 @@ async function applyCode(){
     });
   }catch(error){
     errorLog("Mermaid parse error:",error);
-    setStatus("Mermaid構文エラー",true);
-    toast("Mermaid構文エラー");
+    setStatus(STRINGS.mermaidSyntaxError,true);
+    toast(STRINGS.mermaidSyntaxError);
     showPreviewError(error);
   }
 }
 
-function saveLocal(){
-  try{
-    localStorage.setItem(STORAGE_KEY,JSON.stringify({
-      direction:state.direction,
-      nodes:state.nodes,
-      edges:state.edges,
-      extra:state.extra,
-      offsetX:state.offsetX,
-      offsetY:state.offsetY,
-      zoom:state.zoom,
-      code:state.code || graphToMermaid()
-    }));
-    log("local save complete");
-  }catch(error){
-    errorLog("localStorage save failed:",error);
-    setStatus("保存エラー",true);
-  }
+function idbRequest(request){
+  return new Promise((resolve,reject)=>{
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error || new Error("IndexedDB request failed"));
+  });
 }
 
-function loadLocal(){
-  try{
-    const raw=localStorage.getItem(STORAGE_KEY);
-    if(!raw){
-      log("no saved project");
-      return false;
+function idbTransactionDone(transaction){
+  return new Promise((resolve,reject)=>{
+    transaction.addEventListener("complete",()=>resolve(),{once:true});
+    transaction.addEventListener("error",()=>reject(transaction.error || new Error("IndexedDB transaction failed")),{once:true});
+    transaction.addEventListener("abort",()=>reject(transaction.error || new Error("IndexedDB transaction aborted")),{once:true});
+  });
+}
+
+async function openWorkspaceDB(){
+  if(typeof indexedDB==="undefined") throw new Error(STRINGS.indexedDBNotSupported);
+  const request=indexedDB.open(DB_NAME,DB_VERSION);
+  request.onupgradeneeded=event=>{
+    const db=event.target.result;
+    if(!db.objectStoreNames.contains(PROJECT_STORE)){
+      const store=db.createObjectStore(PROJECT_STORE,{keyPath:"id"});
+      store.createIndex("updatedAt","updatedAt",{unique:false});
+      log("IndexedDB project store created");
     }
+  };
+  const db=await idbRequest(request);
+  db.onversionchange=()=>{db.close();warn("IndexedDB connection closed due to version change");};
+  log("IndexedDB opened successfully",DB_NAME);
+  return db;
+}
 
-    const data=JSON.parse(raw);
-
-    state.direction=["TB","TD","BT","RL","LR"].includes(data.direction) ? data.direction : "TD";
-    state.nodes=Array.isArray(data.nodes) ? data.nodes : [];
-    state.edges=Array.isArray(data.edges) ? data.edges : [];
-    state.extra=Array.isArray(data.extra) ? data.extra : [];
-    state.offsetX=Number.isFinite(data.offsetX)?data.offsetX:300;
-    state.offsetY=Number.isFinite(data.offsetY)?data.offsetY:180;
-    state.zoom=Number.isFinite(data.zoom)?data.zoom:1;
-    state.code=data.code || "";
-
-    for(const node of state.nodes){
-      node.shape=NODE_SHAPES.some(([v])=>v===node.shape) ? node.shape : "rect";
-      const size=normalizeNodeSize(node,estimateNodeSize(node.label || node.id));
-      node.width=node.shape==="diamond" ? size.width : (Number.isFinite(node.width) ? node.width : size.width);
-      node.height=node.shape==="diamond" ? size.height : (Number.isFinite(node.height) ? node.height : size.height);
-      node.x=Number.isFinite(node.x) ? node.x : 0;
-      node.y=Number.isFinite(node.y) ? node.y : 0;
-    }
-
-    log("saved project restored");
-    return true;
-  }catch(error){
-    errorLog("localStorage restore failed:",error);
-    return false;
+async function dbGetAll(storeName){
+  if(!workspaceState.db){errorLog("dbGetAll: database is not initialized",storeName);return [];}
+  if(!workspaceState.db.objectStoreNames.contains(storeName)){
+    warn("IndexedDB store not found",storeName);
+    return [];
   }
+  const transaction=workspaceState.db.transaction(storeName,"readonly");
+  const done=idbTransactionDone(transaction);
+  const result=await idbRequest(transaction.objectStore(storeName).getAll());
+  await done;
+  log("IndexedDB read complete",{storeName,count:result.length});
+  return result;
+}
+
+async function dbGetAllProjects(){
+  return dbGetAll(PROJECT_STORE);
+}
+
+async function dbPutProject(project){
+  if(!workspaceState.db) throw new Error("IndexedDB is not initialized");
+  const transaction=workspaceState.db.transaction(PROJECT_STORE,"readwrite");
+  transaction.objectStore(PROJECT_STORE).put(project);
+  await idbTransactionDone(transaction);
+  log("IndexedDB project saved",project.id);
+}
+
+async function dbDeleteProject(projectId){
+  if(!workspaceState.db) throw new Error("IndexedDB is not initialized");
+  const transaction=workspaceState.db.transaction(PROJECT_STORE,"readwrite");
+  transaction.objectStore(PROJECT_STORE).delete(projectId);
+  await idbTransactionDone(transaction);
+  log("IndexedDB project deleted",projectId);
+}
+
+async function loadWorkspaceData(){
+  workspaceState.projects=await dbGetAllProjects();
+
+  // One-time normalization for data created by the previous project/file model.
+  // The new model keeps one graph directly on each project. No file UI or file selection remains.
+  if(workspaceState.db.objectStoreNames.contains(LEGACY_FILE_STORE)) {
+    const legacyFiles=await dbGetAll(LEGACY_FILE_STORE);
+    let migrated=0;
+    const legacyByProject=new Map();
+    for(const file of legacyFiles){
+      const list=legacyByProject.get(file.projectId)||[];
+      list.push(file);
+      legacyByProject.set(file.projectId,list);
+    }
+    for(const project of workspaceState.projects){
+      if(project.graph && Array.isArray(project.graph.nodes) && Array.isArray(project.graph.edges)) continue;
+      const candidates=legacyByProject.get(project.id)||[];
+      if(!candidates.length) continue;
+      const source=candidates.find(file=>file.id===project.activeFileId)||candidates[0];
+      if(!source?.graph) continue;
+      project.graph=source.graph;
+      project.thumbnail=project.thumbnail||graphThumbnailSvg(source.graph);
+      project.updatedAt=Math.max(project.updatedAt||0,source.updatedAt||0);
+      await dbPutProject(project);
+      migrated++;
+    }
+    if(migrated) log("Legacy project/file data normalized",{projects:migrated});
+  }
+
+  workspaceState.projects.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  log("Workspace loaded",{projects:workspaceState.projects.length});
+}
+
+function getActiveTopTab(){
+  return workspaceState.tabs.find(tab=>tab.id===workspaceState.activeTabId) || null;
+}
+
+function getActiveProject(){
+  const tab=getActiveTopTab();
+  if(tab?.type!=="project") return null;
+  const project=workspaceState.projects.find(item=>item.id===tab.projectId) || null;
+  if(!project){
+    errorLog("Active project tab points to missing project",tab.projectId);
+    return null;
+  }
+  workspaceState.activeProjectId=project.id;
+  return project;
+}
+
+function xmlEscape(value){
+  return String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function graphThumbnailSvg(graph){
+  const nodes=Array.isArray(graph?.nodes)?graph.nodes:[];
+  const edges=Array.isArray(graph?.edges)?graph.edges:[];
+  const W=300,H=168,pad=18;
+  if(!nodes.length) return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#f4f6f8"/><circle cx="150" cy="84" r="23" fill="#fff" stroke="#cfd6df"/><path d="M150 73v22M139 84h22" stroke="#87919e" stroke-width="3" stroke-linecap="round"/></svg>`;
+  const minX=Math.min(...nodes.map(n=>n.x||0),0),minY=Math.min(...nodes.map(n=>n.y||0),0);
+  const maxX=Math.max(...nodes.map(n=>(n.x||0)+(n.width||120)),120),maxY=Math.max(...nodes.map(n=>(n.y||0)+(n.height||52)),52);
+  const scale=Math.min((W-pad*2)/Math.max(1,maxX-minX),(H-pad*2)/Math.max(1,maxY-minY),1.7);
+  const ox=(W-(maxX-minX)*scale)/2-minX*scale,oy=(H-(maxY-minY)*scale)/2-minY*scale;
+  const byId=new Map(nodes.map(n=>[n.id,n]));
+  const edgeSvg=[];
+  for(const edge of edges){
+    const a=byId.get(edge.from),b=byId.get(edge.to); if(!a||!b) continue;
+    const ax=((a.x||0)+(a.width||120)/2)*scale+ox,ay=((a.y||0)+(a.height||52)/2)*scale+oy;
+    const bx=((b.x||0)+(b.width||120)/2)*scale+ox,by=((b.y||0)+(b.height||52)/2)*scale+oy;
+    edgeSvg.push(`<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}" stroke="#9da7b4" stroke-width="1.2"/>`);
+  }
+  const nodeSvg=[];
+  for(const node of nodes){
+    const x=(node.x||0)*scale+ox,y=(node.y||0)*scale+oy,w=(node.width||120)*scale,h=(node.height||52)*scale;
+    if(node.shape==="diamond"){
+      const cx=x+w/2,cy=y+h/2; nodeSvg.push(`<polygon points="${cx},${y} ${x+w},${cy} ${cx},${y+h} ${x},${cy}" fill="#fff" stroke="#66717e" stroke-width="1.1"/>`);
+    }else{
+      const r=node.shape==="round"?Math.min(18,h/2):node.shape==="stadium"?Math.min(18,h/2):0;
+      nodeSvg.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="#fff" stroke="#66717e" stroke-width="1.1"/>`);
+    }
+  }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" fill="#f4f6f8"/>${edgeSvg.join("")}${nodeSvg.join("")}</svg>`;
+}
+
+function renderProjectList(){
+  if(!els.projectGrid||!els.projectEmpty){errorLog("Project list elements missing");return;}
+  els.projectGrid.replaceChildren();
+  const projects=[...workspaceState.projects].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  els.projectEmpty.hidden=projects.length!==0;
+  if(!projects.length) log("Project selection rendered: empty");
+  for(const project of projects){
+    const card=document.createElement("article");
+    card.className="project-card";
+    card.tabIndex=0;
+    const thumb=document.createElement("div");
+    thumb.className="project-thumb";
+    thumb.innerHTML=typeof project.thumbnail==="string"&&project.thumbnail.startsWith("<svg")?project.thumbnail:graphThumbnailSvg(project.graph||blankGraph());
+    const body=document.createElement("div");
+    body.className="project-card-body";
+    const name=document.createElement("div");
+    name.className="project-card-name";
+    name.textContent=project.name||STRINGS.untitledProject;
+    const menu=document.createElement("div");
+    menu.className="project-card-menu";
+
+    const rename=document.createElement("button");
+    rename.type="button";
+    rename.title=STRINGS.renameProjectTitle;
+    rename.setAttribute("aria-label",STRINGS.renameProjectAria);
+    rename.innerHTML='<span class="material-icons-round">edit</span>';
+    rename.addEventListener("click",event=>{event.stopPropagation();void renameProject(project.id);});
+
+    const remove=document.createElement("button");
+    remove.type="button";
+    remove.className="danger";
+    remove.title=STRINGS.deleteProjectTitle;
+    remove.setAttribute("aria-label",STRINGS.deleteProjectAria);
+    remove.innerHTML='<span class="material-icons-round">delete_outline</span>';
+    remove.addEventListener("click",event=>{event.stopPropagation();void deleteProject(project.id);});
+
+    menu.append(rename,remove);
+    body.append(name,menu);
+    card.append(thumb,body);
+    card.addEventListener("click",()=>void openProject(project.id));
+    card.addEventListener("dblclick",event=>{event.preventDefault();void renameProject(project.id);});
+    card.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();void openProject(project.id);}});
+    els.projectGrid.appendChild(card);
+  }
+  log("Project selection rendered",{count:projects.length});
+}
+
+function renderTopTabs(){
+  if(!els.topTabs){errorLog("Top tabs element missing");return;}
+  els.topTabs.replaceChildren();
+  for(const tab of workspaceState.tabs){
+    const button=document.createElement("button");
+    button.type="button";
+    button.className=`top-tab${tab.id===workspaceState.activeTabId?" active":""}`;
+    button.dataset.tabId=tab.id;
+    button.setAttribute("role","tab");
+    button.setAttribute("aria-selected",String(tab.id===workspaceState.activeTabId));
+
+    const icon=document.createElement("span");
+    icon.className="material-icons-round tab-icon";
+    icon.textContent=tab.type==="welcome"?"home":"account_tree";
+
+    const label=document.createElement("span");
+    label.className="top-tab-label";
+    const project=tab.type==="project"?workspaceState.projects.find(item=>item.id===tab.projectId):null;
+    label.textContent=project?.name || tab.label || "Welcome";
+
+    const close=document.createElement("span");
+    close.className="top-tab-close material-icons-round";
+    close.textContent="close";
+    close.title=STRINGS.closeTabTitle;
+    close.setAttribute("aria-label",STRINGS.closeTabAria);
+
+    button.append(icon,label,close);
+    button.addEventListener("click",event=>{
+      if(event.target===close){event.preventDefault();event.stopPropagation();void closeTopTab(tab.id);}
+      else void activateTopTab(tab.id);
+    });
+    if(tab.type==="project"){
+      button.addEventListener("dblclick",event=>{event.preventDefault();void renameProject(tab.projectId);});
+    }
+    els.topTabs.appendChild(button);
+  }
+  log("Top-level tabs rendered",{count:workspaceState.tabs.length,active:workspaceState.activeTabId});
+}
+
+function ensureProjectGraph(project){
+  if(!project) return null;
+  if(!project.graph || !Array.isArray(project.graph.nodes) || !Array.isArray(project.graph.edges)){
+    errorLog("Project graph missing; creating a blank graph",project.id);
+    project.graph=blankGraph();
+  }
+  return project.graph;
+}
+
+function updateTopLevelView(){
+  const active=getActiveTopTab();
+  if(!els.welcomeView||!els.editorView){errorLog("Top-level views missing");return;}
+  if(active?.type==="project"){
+    const project=getActiveProject();
+    if(!project){
+      els.welcomeView.hidden=false;
+      els.editorView.hidden=true;
+      workspaceState.activeProjectId=null;
+      renderProjectList();
+      renderTopTabs();
+      return;
+    }
+    els.welcomeView.hidden=true;
+    els.editorView.hidden=false;
+  }else{
+    workspaceState.activeProjectId=null;
+    els.welcomeView.hidden=false;
+    els.editorView.hidden=true;
+    renderProjectList();
+  }
+  renderTopTabs();
+  log("Top-level tab content updated",{type:active?.type||"welcome",tabId:active?.id||null});
+}
+
+async function persistActiveProjectNow(){
+  const project=getActiveProject();
+  if(!project){log("IndexedDB save skipped: no active project");return false;}
+  const now=Date.now();
+  const graph={direction:state.direction,nodes:JSON.parse(JSON.stringify(state.nodes)),edges:JSON.parse(JSON.stringify(state.edges)),extra:JSON.parse(JSON.stringify(state.extra)),offsetX:state.offsetX,offsetY:state.offsetY,zoom:state.zoom,code:state.code||graphToMermaid()};
+  const updatedProject={...project,graph,updatedAt:now,thumbnail:graphThumbnailSvg(graph)};
+  workspaceState.projects=workspaceState.projects.map(item=>item.id===project.id?updatedProject:item);
+  await dbPutProject(updatedProject);
+  renderTopTabs();
+  renderProjectList();
+  log("Active project persisted",project.id);
+  return true;
+}
+
+function saveLocal(immediate=false){
+  clearTimeout(workspaceState.saveTimer);
+  if(immediate){
+    workspaceState.saveQueue=workspaceState.saveQueue.then(()=>persistActiveProjectNow()).catch(error=>{errorLog("IndexedDB save failed",error);setStatus(STRINGS.saveError,true);return false;});
+    return workspaceState.saveQueue;
+  }
+  workspaceState.saveTimer=setTimeout(()=>{
+    workspaceState.saveQueue=workspaceState.saveQueue.then(()=>persistActiveProjectNow()).catch(error=>{errorLog("IndexedDB auto-save failed",error);setStatus(STRINGS.autoSaveError,true);});
+  },180);
+  return workspaceState.saveQueue;
+}
+
+async function createWelcomeTab(activate=true){
+  const tab={id:uid("T"),type:"welcome",label:"Welcome"};
+  workspaceState.tabs.push(tab);
+  if(activate){
+    workspaceState.activeTabId=tab.id;
+    workspaceState.activeProjectId=null;
+  }
+  renderTopTabs();
+  updateTopLevelView();
+  log("Project selection tab opened",tab);
+  return tab;
+}
+
+async function activateTopTab(tabId){
+  const target=workspaceState.tabs.find(tab=>tab.id===tabId);
+  if(!target){errorLog("activateTopTab: tab not found",tabId);return;}
+  if(target.id===workspaceState.activeTabId){log("Top tab already active",tabId);updateTopLevelView();return;}
+  await saveLocal(true);
+  workspaceState.activeTabId=target.id;
+  if(target.type==="project"){
+    const project=workspaceState.projects.find(item=>item.id===target.projectId);
+    if(!project){
+      errorLog("Project tab points to missing project",target.projectId);
+      workspaceState.tabs=workspaceState.tabs.filter(item=>item.id!==target.id);
+      if(!workspaceState.tabs.length) await createWelcomeTab(true);
+      else {workspaceState.activeTabId=workspaceState.tabs[Math.max(0,workspaceState.tabs.length-1)].id;updateTopLevelView();}
+      return;
+    }
+    workspaceState.activeProjectId=project.id;
+    await loadActiveProject();
+  }else{
+    workspaceState.activeProjectId=null;
+  }
+  updateTopLevelView();
+  log("Top tab activated",target.id);
+}
+
+async function loadActiveProject(){
+  const project=getActiveProject();
+  if(!project){errorLog("loadActiveProject: no active project");return false;}
+  ensureProjectGraph(project);
+  normalizeGraphData(project.graph);
+  state.history=[];
+  state.historyIndex=-1;
+  state.selectedNode=null;
+  state.selectedEdge=null;
+  pushHistory();
+  renderAll();
+  setStatus(`${state.nodes.length} ${STRINGS.nodesEdgesCount} ${state.edges.length}`);
+  requestAnimationFrame(()=>fitView());
+  log("Project loaded",{projectId:project.id,name:project.name});
+  return true;
+}
+
+async function openProject(projectId){
+  const project=workspaceState.projects.find(item=>item.id===projectId);
+  if(!project){errorLog("openProject: project not found",projectId);return;}
+
+  const active=getActiveTopTab();
+  const existing=workspaceState.tabs.find(tab=>tab.type==="project"&&tab.projectId===projectId);
+  if(existing && existing.id!==active?.id){
+    await activateTopTab(existing.id);
+    log("Existing project tab activated",{projectId,tabId:existing.id});
+    return;
+  }
+
+  let target=active;
+  if(!target){target=await createWelcomeTab(false);}
+  if(target.type!=="welcome"){
+    if(target.type==="project"&&target.projectId===projectId){log("Project tab already active",projectId);return;}
+    errorLog("openProject: active tab is not a project-selection tab",target);
+    return;
+  }
+
+  await saveLocal(true);
+  ensureProjectGraph(project);
+  target.type="project";
+  target.projectId=projectId;
+  target.label=project.name||STRINGS.untitledProject;
+  workspaceState.activeTabId=target.id;
+  workspaceState.activeProjectId=projectId;
+  await dbPutProject(project);
+  await loadActiveProject();
+  updateTopLevelView();
+  log("Project opened in selection tab",{projectId,tabId:target.id,name:project.name});
+}
+
+async function closeTopTab(tabId){
+  const index=workspaceState.tabs.findIndex(tab=>tab.id===tabId);
+  if(index<0){errorLog("closeTopTab: tab not found",tabId);return;}
+  const wasActive=workspaceState.activeTabId===tabId;
+  if(wasActive) await saveLocal(true);
+  workspaceState.tabs.splice(index,1);
+  if(!workspaceState.tabs.length){await createWelcomeTab(true);return;}
+  if(wasActive){
+    const next=workspaceState.tabs[index]||workspaceState.tabs[index-1]||workspaceState.tabs[0];
+    workspaceState.activeTabId=next.id;
+    if(next.type==="project") await loadActiveProject();
+    else workspaceState.activeProjectId=null;
+  }
+  updateTopLevelView();
+  log("Top tab closed",{tabId,wasActive});
+}
+
+async function renameProject(projectId){
+  const project=workspaceState.projects.find(item=>item.id===projectId);
+  if(!project){errorLog("renameProject: project not found",projectId);return;}
+  const name=window.prompt(STRINGS.projectNamePrompt,project.name||STRINGS.untitledProject);
+  if(name===null){log("Project rename cancelled",projectId);return;}
+  const trimmed=name.trim();
+  if(!trimmed){toast(STRINGS.enterName);warn("empty project name rejected");return;}
+  const updated={...project,name:trimmed,updatedAt:Date.now()};
+  await dbPutProject(updated);
+  workspaceState.projects=workspaceState.projects.map(item=>item.id===projectId?updated:item);
+  renderTopTabs();
+  renderProjectList();
+  log("Project renamed",{projectId,name:trimmed});
+}
+
+async function deleteProject(projectId){
+  const project=workspaceState.projects.find(item=>item.id===projectId);
+  if(!project){errorLog("deleteProject: project not found",projectId);return;}
+  if(!window.confirm(`${project.name||STRINGS.untitledProject}${STRINGS.deleteConfirm}`)){log("Project deletion cancelled",projectId);return;}
+
+  const opened=workspaceState.tabs.filter(tab=>tab.type==="project"&&tab.projectId===projectId);
+  const activeWasOpened=opened.some(tab=>tab.id===workspaceState.activeTabId);
+  await saveLocal(true);
+  await dbDeleteProject(projectId);
+  workspaceState.projects=workspaceState.projects.filter(item=>item.id!==projectId);
+  workspaceState.tabs=workspaceState.tabs.filter(tab=>!(tab.type==="project"&&tab.projectId===projectId));
+
+  if(!workspaceState.tabs.length){
+    await createWelcomeTab(true);
+  }else if(activeWasOpened || !workspaceState.tabs.some(tab=>tab.id===workspaceState.activeTabId)){
+    const next=workspaceState.tabs[Math.max(0,Math.min(workspaceState.tabs.length-1,opened[0]?0:workspaceState.tabs.length-1))] || workspaceState.tabs[0];
+    workspaceState.activeTabId=next.id;
+    if(next.type==="project") await loadActiveProject();
+    else workspaceState.activeProjectId=null;
+    updateTopLevelView();
+  }else{
+    renderTopTabs();
+    renderProjectList();
+  }
+  log("Project deleted",projectId);
+}
+
+async function createProject(){
+  const name=window.prompt(STRINGS.projectNamePrompt,STRINGS.newProjectPrompt);
+  if(name===null){log("Project creation cancelled");return;}
+  const trimmed=name.trim();
+  if(!trimmed){toast(STRINGS.enterName);warn("empty project name rejected");return;}
+
+  const now=Date.now();
+  let graph;
+  try{
+    const parsed=await parseMermaidSource(`flowchart TD\nStart[${STRINGS.importStart}] --> Process[${STRINGS.importProcess}] --> End[${STRINGS.importEnd}]`);
+    graph={...parsed,offsetX:300,offsetY:180,zoom:1,code:`flowchart ${parsed.direction||"TD"}`};
+  }catch(error){
+    errorLog("Initial graph creation failed",error);
+    graph=blankGraph();
+  }
+
+  const project={id:uid("P"),name:trimmed,createdAt:now,updatedAt:now,graph,thumbnail:graphThumbnailSvg(graph)};
+  await dbPutProject(project);
+  workspaceState.projects.push(project);
+  workspaceState.projects.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  renderProjectList();
+  await openProject(project.id);
+  log("Project created",{projectId:project.id,name:trimmed});
 }
 
 function clearSelection(){
@@ -2979,7 +3498,7 @@ function copySelection(){
       data:JSON.parse(JSON.stringify(node))
     };
     writeClipboardText(shapeToSyntax(node));
-    toast("ノードをコピーしました");
+    toast(STRINGS.nodeCopied);
     log("node copied",node.id);
     return;
   }
@@ -2996,12 +3515,12 @@ function copySelection(){
       data:JSON.parse(JSON.stringify(edge))
     };
     writeClipboardText(edgeSyntax(edge));
-    toast("接続をコピーしました");
+    toast(STRINGS.connectionCopied);
     log("edge copied",edge.id);
     return;
   }
 
-  toast("コピーする要素を選択してください");
+  toast(STRINGS.selectElementToCopy);
 }
 
 async function writeClipboardText(text){
@@ -3021,7 +3540,7 @@ async function writeClipboardText(text){
 function pasteSelection(){
   const clip=state.clipboard;
   if(!clip){
-    toast("コピーした要素がありません");
+    toast(STRINGS.noCopiedElement);
     log("paste unavailable");
     return;
   }
@@ -3052,7 +3571,7 @@ function pasteSelection(){
   if(clip.type==="edge"){
     const source=clip.data;
     if(!source || !getNode(source.from) || !getNode(source.to)){
-      toast("接続先のノードがありません");
+      toast(STRINGS.noTargetNode);
       warn("edge paste skipped because endpoints are missing");
       return;
     }
@@ -3070,20 +3589,20 @@ function pasteSelection(){
     state.selectedNode=null;
     pushHistory();
     renderAll();
-    toast("接続を貼り付けました");
+    toast(STRINGS.connectionCopied);
     log("edge pasted",edge.id);
   }
 }
 
 function cutSelection(){
   if(!state.selectedNode && !state.selectedEdge){
-    toast("切り取る要素を選択してください");
+    toast(STRINGS.selectElementToCopy);
     return;
   }
 
   copySelection();
   removeSelected();
-  toast("切り取りました");
+  toast(STRINGS.cut);
   log("selection cut");
 }
 
@@ -3243,77 +3762,14 @@ els.zoomOut?.addEventListener("click",()=>{
 els.fitBtn?.addEventListener("click",fitView);
 els.resetViewBtn?.addEventListener("click",resetView);
 
-els.saveBtn?.addEventListener("click",()=>{
-  saveLocal();
-  toast("保存しました");
-  log("manual save complete");
+els.saveBtn?.addEventListener("click",async()=>{
+  const saved=await saveLocal(true);
+  if(saved!==false){toast(STRINGS.saved);log("Manual IndexedDB save complete");}
 });
 
-els.previewBtn?.addEventListener("click",()=>void showPreview());
-
-els.closePreview?.addEventListener("click",()=>{
-  els.previewOverlay?.classList.remove("open");
-  log("preview closed");
-});
-
-els.exportBtn?.addEventListener("click",()=>void exportSvg());
-
-els.applyCode?.addEventListener("click",()=>void applyCode());
-
-els.copyCode?.addEventListener("click",async()=>{
-  if(!els.codeEditor){
-    errorLog("copyCode: code editor not found");
-    return;
-  }
-
-  if(!navigator.clipboard?.writeText){
-    toast("クリップボードが利用できません");
-    warn("navigator.clipboard.writeText unavailable");
-    return;
-  }
-
-  try{
-    await navigator.clipboard.writeText(els.codeEditor.value);
-    toast("コピーしました");
-    log("Mermaid code copied");
-  }catch(error){
-    errorLog("Code clipboard error:",error);
-    toast("コピーできませんでした");
-  }
-});
-
-els.propertiesTab?.addEventListener("click",()=>{
-  const propertiesTab=$("propertiesTab");
-  const codeTab=$("codeTab");
-
-  if(!propertiesTab || !codeTab){
-    errorLog("properties/code tabs not found");
-    return;
-  }
-
-  propertiesTab.classList.add("active");
-  codeTab.classList.remove("active");
-  els.propertiesPanel.style.display="";
-  els.codePanel.style.display="none";
-  log("properties tab opened");
-});
-
-els.codeTab?.addEventListener("click",()=>{
-  const propertiesTab=$("propertiesTab");
-  const codeTab=$("codeTab");
-
-  if(!propertiesTab || !codeTab){
-    errorLog("properties/code tabs not found");
-    return;
-  }
-
-  codeTab.classList.add("active");
-  propertiesTab.classList.remove("active");
-  els.propertiesPanel.style.display="none";
-  els.codePanel.style.display="";
-  els.codeEditor.value=graphToMermaid();
-  log("Mermaid tab opened");
-});
+els.newTopTabBtn?.addEventListener("click",()=>void createWelcomeTab(true));
+els.createProjectBtn?.addEventListener("click",()=>void createProject());
+els.renameBtn?.addEventListener("click",()=>{if(workspaceState.activeProjectId)void renameProject(workspaceState.activeProjectId);});
 
 document.addEventListener("keydown",event=>{
   const target=event.target;
@@ -3380,66 +3836,36 @@ document.addEventListener("keydown",event=>{
   }
 });
 
-window.addEventListener("beforeunload",saveLocal);
+window.addEventListener("beforeunload",()=>{void saveLocal(true);});
+window.addEventListener("pagehide",()=>{void saveLocal(true);});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden") void saveLocal(true);});
 
 async function boot(){
   try{
-    const requiredElements=[
-      ["canvas",els.canvas],
-      ["diagram",els.diagram],
-      ["edgesLayer",els.edgesLayer],
-      ["propertiesPanel",els.propertiesPanel],
-      ["codePanel",els.codePanel],
-      ["codeEditor",els.codeEditor],
-      ["status",els.status],
-      ["toast",els.toast],
-      ["minimap",els.minimap],
-      ["zoomValue",els.zoomValue],
-      ["previewOverlay",els.previewOverlay],
-      ["previewContainer",els.previewContainer]
+    const required=[
+      ["canvas",els.canvas],["diagram",els.diagram],["edgesLayer",els.edgesLayer],["propertiesPanel",els.propertiesPanel],
+      ["codePanel",els.codePanel],["codeEditor",els.codeEditor],["status",els.status],["toast",els.toast],["minimap",els.minimap],
+      ["zoomValue",els.zoomValue],["previewOverlay",els.previewOverlay],["previewContainer",els.previewContainer],
+      ["topTabs",els.topTabs],["newTopTabBtn",els.newTopTabBtn],["welcomeView",els.welcomeView],["editorView",els.editorView],
+      ["projectGrid",els.projectGrid],["projectEmpty",els.projectEmpty],["createProjectBtn",els.createProjectBtn]
     ];
-
-    const missing=requiredElements.filter(([,element])=>!element).map(([name])=>name);
-    if(missing.length){
-      throw new Error(`必要なDOM要素がありません: ${missing.join(", ")}`);
-    }
-
+    const missing=required.filter(([,element])=>!element).map(([name])=>name);
+    if(missing.length) throw new Error(`必要なDOM要素がありません: ${missing.join(", ")}`);
     setStatus("Mermaidを初期化中...");
     await mermaid.parse("flowchart TD\nA[Start] -->|Yes| B(B)");
-
-    const restored=loadLocal();
-    const mermaidSource=`flowchart TD\nStart[ノードをクリック] --> Process[上下左右の点をドラッグ] --> End[接続可能]`;
-
-    if(!restored){
-      try{
-        const parsed=await parseMermaidSource(mermaidSource);
-        state.direction=parsed.direction;
-        state.nodes=parsed.nodes;
-        state.edges=parsed.edges;
-        state.extra=parsed.extra;
-      }catch(error){
-        errorLog("Initial Mermaid parse failed:",error);
-        setStatus("初期化エラー",true);
-        showPreviewError(error);
-        return;
-      }
-      pushHistory();
-    }else{
-      state.history=[];
-      state.historyIndex=-1;
-      pushHistory();
-    }
-
-    renderAll();
-    state.code=mermaidSource;
-    saveLocal();
-    fitView();
-
-    setStatus(`${state.nodes.length} ノード / ${state.edges.length} 接続`);
-    log("Editor initialized without React");
+    setStatus(STRINGS.initializingIndexedDB);
+    workspaceState.db=await openWorkspaceDB();
+    await loadWorkspaceData();
+    workspaceState.initialized=true;
+    await createWelcomeTab(true);
+    renderProjectList();
+    setStatus(`${workspaceState.projects.length} ${STRINGS.projectCount}`);
+    log("Editor initialized",{projects:workspaceState.projects.length,tabs:workspaceState.tabs.length});
   }catch(error){
     errorLog("Boot error:",error);
-    setStatus("初期化エラー",true);
+    setStatus(STRINGS.initError,true);
+    if(els.welcomeView) els.welcomeView.hidden=false;
+    if(els.editorView) els.editorView.hidden=true;
     showPreviewError(error);
   }
 }
