@@ -29,23 +29,36 @@
         /*
          * URLから言語を検出。
          */
-        function getLanguageFromURL() {
-          const path = window.location.pathname;
-          if (path.includes("/i/en/")) return "en";
-          if (path.includes("/i/zh/")) return "zh";
-          if (path.includes("/i/ru/")) return "ru";
-          if (path.includes("/i/hi/")) return "hi";
-          if (path.includes("/i/kr/") || path.includes("/i/kp/")) return "ko";
-          if (path.includes("/i/zh-tw/")) return "zh-TW";
-          return "ja";
-        }
+         function getLanguageFromURL() {
+           const path = window.location.pathname;
+           if (path.includes("/i/en/")) return "en";
+           if (path.includes("/i/zh/")) return "zh";
+           if (path.includes("/i/ru/")) return "ru";
+           if (path.includes("/i/hi/")) return "hi";
+           if (path.includes("/i/kr/")) return "kr";
+           if (path.includes("/i/kp/")) return "kp";
+           if (path.includes("/i/zh-tw/")) return "zh-tw";
+           return "ja";
+         }
 
-        const lang = getLanguageFromURL();
+         const lang = getLanguageFromURL();
 
-        /*
-         * 言語別の表示文章。
-         * accent=true の部分が強調される。
-         */
+         /*
+          * .product-linkのhrefからLANGUAGEを現在の言語に置換。
+          */
+         document.querySelectorAll(".product-link").forEach(
+           (link) => {
+             const href = link.getAttribute("href");
+             if (href && href.includes("LANGUAGE")) {
+               link.setAttribute("href", href.replaceAll("LANGUAGE", lang));
+             }
+           }
+         );
+
+         /*
+          * 言語別の表示文章。
+          * accent=true の部分が強調される。
+          */
         const messages = {
           ja: [
             { text: "終わりなく", accent: false },
@@ -68,15 +81,25 @@
             { text: "अंतहीन", accent: false },
             { text: "रचनात्मकता के निरंतर होने की कामना करता हूँ", accent: true }
           ],
-          ko: [
-            { text: "끝없이", accent: false },
-            { text: "창의성이 이어지기를", accent: true },
-            { text: "바랍니다", accent: false }
-          ],
-          "zh-TW": [
-            { text: "願", accent: false },
-            { text: "創造力永無止境", accent: true }
-          ]
+           ko: [
+             { text: "끝없이", accent: false },
+             { text: "창의성이 이어지기를", accent: true },
+             { text: "바랍니다", accent: false }
+           ],
+           kr: [
+             { text: "끝없이", accent: false },
+             { text: "창의성이 이어지기를", accent: true },
+             { text: "바랍니다", accent: false }
+           ],
+           kp: [
+             { text: "끝없이", accent: false },
+             { text: "창의성이 이어지기를", accent: true },
+             { text: "바랍니다", accent: false }
+           ],
+           "zh-tw": [
+             { text: "願", accent: false },
+             { text: "創造力永無止境", accent: true }
+           ]
         };
 
         const messageParts = messages[lang] || messages.ja;

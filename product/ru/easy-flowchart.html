@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Лёгкий Флоучарт — Редактор флоучартов на основе Mermaid</title>
+<meta name="description" content="Редактор флоучартов в браузере с поддержкой Mermaid. Открывайте Welcome и проекты во вкладках и редактируйте проекты напрямую.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a73e8">
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Лёгкий Флоучарт — Редактор флоучартов на основе Mermaid">
+<meta property="og:description" content="Редактор флоучартов на основе Mermaid, который позволяет интуитивно редактировать узлы и стрелки, открывая Welcome и проекты во вкладках.">
+<meta property="og:image" content="icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Лёгкий Флоучарт — Редактор флоучартов на основе Mermaid">
+<meta name="twitter:description" content="Редактор флоучартов на основе Mermaid, доступный в браузере.">
+<link rel="icon" type="image/png" href="../src/easy-flowchart/icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Лёгкий Флоучарт","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"Редактор флоучартов в браузере с поддержкой Mermaid.","url":"./"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/easy-flowchart/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar workspace-tabs-bar">
+    <div id="topTabs" class="top-tabs" role="tablist" aria-label="Открытые вкладки"></div>
+    <button id="newTopTabBtn" class="new-top-tab" type="button" title="Новая вкладка" aria-label="Новая вкладка">
+      <span class="material-icons-round">add</span>
+    </button>
+  </header>
+
+  <!-- Сам Welcome является содержимым верхнего уровня вкладки. Открытие проекта из здесь меняет текущую вкладку Welcome на вкладку проекта. -->
+  <main id="welcomeView" class="welcome-view" hidden>
+    <section class="welcome-shell">
+      <img class="welcome-logo" src="../src/easy-flowchart/icon.png" alt="Лёгкий Флоучарт" width="96" height="96">
+      <div class="welcome-eyebrow">Nidele Series</div>
+      <h1>Лёгкий Флоучарт</h1>
+      <p>Начните с "Нового проекта"</p>
+      <button id="createProjectBtn" class="primary welcome-create" type="button">
+        <span class="material-icons-round">add</span>Новый проект
+      </button>
+    </section>
+    <section class="project-section" aria-labelledby="projectSectionTitle">
+      <div class="project-section-head">
+        <div>
+          <h2 id="projectSectionTitle">Проекты</h2>
+        </div>
+      </div>
+      <div id="projectGrid" class="project-grid"></div>
+      <div id="projectEmpty" class="project-empty" hidden>
+        <span class="material-icons-round">folder_open</span>
+        <strong>Проектов пока нет</strong>
+        <p>Вы можете создать из "Нового проекта".</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Содержимое вкладки проекта. Проект — это один редактируемый документ, внутри него нет файловых вкладок. -->
+  <section id="editorView" class="editor-view" hidden>
+    <header class="topbar project-toolbar">
+      <div id="status" class="status">Готово...</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="renameBtn" title="Переименовать" aria-label="Переименовать"><span class="material-icons-round">edit</span>Переименовать</button>
+        <button class="icon-btn" id="undoBtn" title="Отменить" aria-label="Отменить"><span class="material-icons-round">undo</span></button>
+        <button class="icon-btn" id="redoBtn" title="Повторить" aria-label="Повторить"><span class="material-icons-round">redo</span></button>
+        <button class="icon-btn" id="previewBtn" title="Просмотр Mermaid" aria-label="Просмотр Mermaid"><span class="material-icons-round">play_arrow</span>Просмотр SVG</button>
+        <button class="icon-btn" id="exportBtn" title="Экспорт SVG" aria-label="Экспорт SVG"><span class="material-icons-round">download</span>Скачать</button>
+        <button class="icon-btn save-btn" id="saveBtn" title="Ручное сохранение" aria-label="Ручное сохранение"><span class="material-icons-round">save</span>Ручное сохранение</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <div id="canvas" class="canvas">
+        <div class="canvas-grid"></div>
+        <div id="diagram" class="diagram">
+          <svg id="edgesLayer" class="edges-layer"></svg>
+          <button id="selectionAction" class="selection-action" type="button" title="Удалить" aria-label="Удалить">
+            <span class="material-icons-round">delete</span>
+          </button>
+        </div>
+
+        <button id="addNodeBtn" class="fab" type="button" title="Добавить узел" aria-label="Добавить узел">
+          <span class="material-icons-round">add</span>
+          <span>Добавить узел</span>
+        </button>
+
+        <div class="zoom-info">
+          <button id="zoomOut" title="Уменьшить" aria-label="Уменьшить"><span class="material-icons-round">remove</span></button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button id="zoomIn" title="Увеличить" aria-label="Увеличить"><span class="material-icons-round">add</span></button>
+        </div>
+
+        <div id="minimap" class="minimap"><svg></svg></div>
+
+        <div class="view-controls" aria-label="Элементы управления просмотром">
+          <button id="fitBtn" title="По размеру экрана" aria-label="По размеру экрана"><span class="material-icons-round">fit_screen</span></button>
+          <button id="resetViewBtn" title="Сбросить вид" aria-label="Сбросить вид"><span class="material-icons-round">center_focus_strong</span></button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <div id="previewOverlay" class="preview-overlay">
+          <div class="preview-header">
+            <div class="preview-title">Просмотр Mermaid</div>
+            <button id="closePreview" class="secondary" type="button">
+              <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+              Закрыть
+            </button>
+          </div>
+          <div class="preview-body"><div id="previewContainer" class="preview-container"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button id="propertiesTab" class="panel-tab active" type="button">Свойства</button>
+        <button id="codeTab" class="panel-tab" type="button">Mermaid (Бета)</button>
+      </div>
+      <div id="propertiesPanel" class="panel-content"></div>
+      <div id="codePanel" class="panel-content" style="display:none">
+        <div class="code-wrap">
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+          <div class="code-actions">
+            <button id="applyCode" class="primary" type="button">Применить код</button>
+            <button id="copyCode" class="secondary" type="button">Копировать</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</div>
+<script src="https://nidele206.github.io/check.js?check=none"></script>
+<script>
+window.STRINGS={
+  shapeRect:"Прямоугольник",shapeRound:"Скруглённый",shapeStadium:"Капсула",shapeDiamond:"Ромб",
+  edgeArrow:"Стрелка",edgeLine:"Линия",edgeDotted:"Пунктир",edgeThick:"Толстая",edgeCircle:"Круг",edgeCross:"×",
+  newNode:"Новый узел",nodeDeleted:"Узел удалён",edgeDeleted:"Соединение удалено",
+  selectExistingNode:"Пожалуйста, выберите существующий узел",duplicateId:"Этот ID уже используется",
+  invalidPosition:"Введите число для позиции",duplicateEdge:"Это соединение уже существует",
+  unsupportedShapes:"Фигуры, доступные в этом редакторе: только прямоугольник, скруглённый, капсула и ромб.",
+  dragToConnect:"Перетащите для соединения",noNodesToDisplay:"Нет узлов для отображения",
+  renderingMermaid:"Рендеринг Mermaid...",svgPreviewElementFailed:"Не удалось создать элемент SVG для предпросмотра",
+  svgDownloadElementFailed:"Не удалось создать элемент SVG для загрузки",svgOutputError:"Ошибка вывода SVG",
+  codeIsEmpty:"Код пуст",codeApplied:"Код применён (избежание наложения)",
+  mermaidSyntaxError:"Ошибка синтаксиса Mermaid",indexedDBNotSupported:"IndexedDB недоступен в этом браузере",
+  untitledProject:"Без названия",renameProjectTitle:"Переименовать",renameProjectAria:"Переименовать проект",
+  deleteProjectTitle:"Удалить",deleteProjectAria:"Удалить проект",closeTabTitle:"Закрыть вкладку",
+  closeTabAria:"Закрыть вкладку",saveError:"Ошибка сохранения",autoSaveError:"Ошибка автосохранения",
+  projectNamePrompt:"Название проекта",newProjectPrompt:"Новый проект",enterName:"Введите имя",
+  nodeCopied:"Узел скопирован",connectionCopied:"Соединение скопировано",
+  selectElementToCopy:"Выберите элемент для копирования",noCopiedElement:"Нет скопированного элемента",
+  noTargetNode:"Нет целевого узла",initError:"Ошибка инициализации",saved:"Сохранено",
+  svgExported:"SVG экспортирован",svgExportFailed:"Экспорт SVG не удался",
+  mermaidSvgEmpty:"Результат генерации SVG Mermaid пуст",mermaidSvgNotFound:"Элемент Mermaid SVG не найден",
+  parsingMermaid:"Парсинг Mermaid...",positionHint:"Позицию можно перетаскивать на холсте. Размер автоматически подстраивается под содержимое.",
+  edgeLabelSyntaxHint:"Стрелка с меткой создаётся с помощью официального синтаксиса Mermaid <code>--&gt;|label|</code>.",
+  connectionHint:"Перетащите от точек соединения сверху, снизу, слева или справа от узла, чтобы соединить с предпросмотром линии.",
+  selectNodeOrEdge:"Выберите узел или соединение, чтобы",editProperties:"редактировать свойства.",
+  appName:"Nidele Лёгкий Флоучарт",initializingMermaid:"Инициализация Mermaid...",
+  initializingIndexedDB:"Инициализация IndexedDB...",projectCount:"Проекты",nodesEdgesCount:"Узлы / Соединения",
+  deleteConfirm:"Удалить?",importStart:"Нажмите на узел",importProcess:"Перетащите точки сверху, снизу, слева или справа",
+  importEnd:"Готово к соединению",undo:"Отменено",redo:"Повторено",
+  label:"Метка",shape:"Фигура",direction:"Направление",startNode:"Начальный узел",endNode:"Конечный узел",type:"Тип",
+  nodeAdded:"Узел добавлен",connectionComplete:"Соединено",connectionCanceled:"Соединение отменено"
+};
+</script>
+<script type="module" src="../src/easy-flowchart/app.js"></script>
+<noscript><p>Это редактор флоучартов на основе Mermaid для браузера. Включите JavaScript, чтобы открывать Welcome и проекты во вкладках.</p></noscript>
+</body>
+</html>

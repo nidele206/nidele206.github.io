@@ -1,0 +1,156 @@
+<!--If you're not normal, kill-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f9fb" />
+  <title>Station Launcher</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+  <link rel="icon" href="../src/oneul-launcher/icon.png" type="image/png">
+  <link rel="stylesheet" href="../src/oneul-launcher/style.css">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '@material/web/all.js';
+  </script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-title">Station Launcher</div>
+      </div>
+      <div class="tab-list" id="workspaceList"></div>
+      <div class="sidebar-bottom">
+        <md-outlined-button id="addWorkspaceBtn">
+          <span class="material-symbols-outlined" slot="icon">add</span>
+          New Board
+        </md-outlined-button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-inner" id="workspaceView">
+        <header class="page-head">
+          <div class="page-head-copy">
+            <h1 class="page-title" id="workspaceTitle">Work</h1>
+          </div>
+          <div class="page-actions">
+            <md-icon-button id="workspaceMenuBtn" aria-label="More">
+              <span class="material-symbols-outlined">more_vert</span>
+            </md-icon-button>
+            <md-filled-button id="launchAllBtn">
+              <span class="material-symbols-outlined" slot="icon">open_in_new</span>
+              Launch All
+            </md-filled-button>
+          </div>
+        </header>
+
+        <section class="memo-area">
+          <textarea id="memo" class="memo-box" placeholder="Memo input area. Saved automatically."></textarea>
+        </section>
+
+        <section class="links-panel">
+          <div class="links-head">
+            <div class="links-head-title"><strong>Links</strong><span id="linkCount">0 items</span></div>
+            <md-outlined-button id="addLinkBtn">
+              <span class="material-symbols-outlined" slot="icon">add</span>
+              Add Link
+            </md-outlined-button>
+          </div>
+          <div class="link-list" id="linkList"></div>
+        </section>
+      </div>
+
+      <div class="main-inner" id="overviewView" style="display:none">
+        <p id="overviewGreeting" class="overview-greeting"></p>
+        <div class="overview-meta">
+          <a class="overview-meta-link" href="https://nidele206.github.io/" target="_blank" rel="noopener noreferrer">About Nidele Series</a>
+          <span class="overview-meta-sep">/</span>
+          <a class="overview-meta-link" href="https://nidele206.github.io/policies/" target="_blank" rel="noopener noreferrer">Terms of Service and Privacy Policy</a>
+        </div>
+        <section class="links-panel">
+          <div class="links-head">
+
+
+            <div class="links-head-title"><strong>Top 5 Links</strong></div>
+          </div>
+          <div class="link-list" id="overviewContent"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <md-menu id="rowMenu" positioning="fixed">
+    <md-menu-item id="menuEdit">Edit</md-menu-item>
+    <md-menu-item id="menuDelete">Delete</md-menu-item>
+  </md-menu>
+
+  <md-menu id="workspaceMenu" positioning="fixed">
+    <md-menu-item id="menuWorkspaceEdit">Edit Name</md-menu-item>
+    <md-menu-item id="menuWorkspaceDelete">Delete Group</md-menu-item>
+  </md-menu>
+
+  <!-- Delete confirmation dialog -->
+  <md-dialog id="deleteWorkspaceDialog">
+    <div slot="headline">Delete Group</div>
+    <div slot="content" class="dialog-body">
+      <p>Delete this group? This action cannot be undone.</p>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-text-button id="deleteWorkspaceCancelBtn">Cancel</md-text-button>
+      <md-filled-button id="deleteWorkspaceConfirmBtn">Delete</md-filled-button>
+    </div>
+  </md-dialog>
+
+  <!-- Link dialog -->
+  <md-dialog id="linkDialog">
+    <div slot="headline" id="linkDialogTitle">Add Link</div>
+    <div slot="content" class="dialog-body">
+      <md-outlined-text-field id="nameField" label="Name" supporting-text="Title displayed in list" required></md-outlined-text-field>
+      <md-outlined-text-field id="urlField" label="Link" supporting-text="URL starting with https://" required></md-outlined-text-field>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-text-button id="linkCancelBtn">Cancel</md-text-button>
+      <md-filled-button id="linkSaveBtn">Save</md-filled-button>
+    </div>
+  </md-dialog>
+
+  <!-- Workspace dialog -->
+  <md-dialog id="workspaceDialog">
+    <div slot="headline" id="workspaceDialogHeadline">New Launch Board</div>
+    <div slot="content" class="dialog-body">
+      <md-outlined-text-field id="workspaceNameField" label="Title" supporting-text="E.g., Work, Development, Study, Research" required></md-outlined-text-field>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-text-button id="workspaceCancelBtn">Cancel</md-text-button>
+      <md-filled-button id="workspaceSaveBtn">Add</md-filled-button>
+    </div>
+  </md-dialog>
+
+   <script src="../src/oneul-launcher/app.js"></script>
+
+   <script src="https://nidele206.github.io/check.js?check=none"></script>
+
+   <!-- Google tag (gtag.js) -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-SCNW6MLLLT"></script>
+ <script>
+   window.dataLayer = window.dataLayer || [];
+   function gtag(){dataLayer.push(arguments);}
+   gtag('js', new Date());
+
+   gtag('config', 'G-SCNW6MLLLT');
+ </script>
+</body>
+</html>

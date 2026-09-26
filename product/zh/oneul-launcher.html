@@ -1,0 +1,156 @@
+<!--如果你不正常，就杀了他-->
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f8f9fb" />
+  <title>站点启动器</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0" rel="stylesheet">
+  <link rel="icon" href="../src/oneul-launcher/icon.png" type="image/png">
+  <link rel="stylesheet" href="../src/oneul-launcher/style.css">
+
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '@material/web/all.js';
+  </script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"></div>
+        <div class="brand-title">站点启动器</div>
+      </div>
+      <div class="tab-list" id="workspaceList"></div>
+      <div class="sidebar-bottom">
+        <md-outlined-button id="addWorkspaceBtn">
+          <span class="material-symbols-outlined" slot="icon">add</span>
+          新建看板
+        </md-outlined-button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-inner" id="workspaceView">
+        <header class="page-head">
+          <div class="page-head-copy">
+            <h1 class="page-title" id="workspaceTitle">工作</h1>
+          </div>
+          <div class="page-actions">
+            <md-icon-button id="workspaceMenuBtn" aria-label="更多">
+              <span class="material-symbols-outlined">more_vert</span>
+            </md-icon-button>
+            <md-filled-button id="launchAllBtn">
+              <span class="material-symbols-outlined" slot="icon">open_in_new</span>
+              全部启动
+            </md-filled-button>
+          </div>
+        </header>
+
+        <section class="memo-area">
+          <textarea id="memo" class="memo-box" placeholder="备忘录输入框。自动保存。"></textarea>
+        </section>
+
+        <section class="links-panel">
+          <div class="links-head">
+            <div class="links-head-title"><strong>链接</strong><span id="linkCount">0个</span></div>
+            <md-outlined-button id="addLinkBtn">
+              <span class="material-symbols-outlined" slot="icon">add</span>
+              添加链接
+            </md-outlined-button>
+          </div>
+          <div class="link-list" id="linkList"></div>
+        </section>
+      </div>
+
+      <div class="main-inner" id="overviewView" style="display:none">
+        <p id="overviewGreeting" class="overview-greeting"></p>
+        <div class="overview-meta">
+          <a class="overview-meta-link" href="https://nidele206.github.io/" target="_blank" rel="noopener noreferrer">关于Nidele系列</a>
+          <span class="overview-meta-sep">/</span>
+          <a class="overview-meta-link" href="https://nidele206.github.io/policies/" target="_blank" rel="noopener noreferrer">服务条款及隐私政策</a>
+        </div>
+        <section class="links-panel">
+          <div class="links-head">
+
+
+            <div class="links-head-title"><strong>前5个链接</strong></div>
+          </div>
+          <div class="link-list" id="overviewContent"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <md-menu id="rowMenu" positioning="fixed">
+    <md-menu-item id="menuEdit">编辑</md-menu-item>
+    <md-menu-item id="menuDelete">删除</md-menu-item>
+  </md-menu>
+
+  <md-menu id="workspaceMenu" positioning="fixed">
+    <md-menu-item id="menuWorkspaceEdit">编辑名称</md-menu-item>
+    <md-menu-item id="menuWorkspaceDelete">删除分组</md-menu-item>
+  </md-menu>
+
+  <!-- Delete confirmation dialog -->
+  <md-dialog id="deleteWorkspaceDialog">
+    <div slot="headline">删除分组</div>
+    <div slot="content" class="dialog-body">
+      <p>是否删除此分组？此操作不可撤销。</p>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-text-button id="deleteWorkspaceCancelBtn">取消</md-text-button>
+      <md-filled-button id="deleteWorkspaceConfirmBtn">删除</md-filled-button>
+    </div>
+  </md-dialog>
+
+  <!-- Link dialog -->
+  <md-dialog id="linkDialog">
+    <div slot="headline" id="linkDialogTitle">添加链接</div>
+    <div slot="content" class="dialog-body">
+      <md-outlined-text-field id="nameField" label="名称" supporting-text="列表中显示的标题" required></md-outlined-text-field>
+      <md-outlined-text-field id="urlField" label="链接" supporting-text="以https://开头的URL" required></md-outlined-text-field>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-text-button id="linkCancelBtn">取消</md-text-button>
+      <md-filled-button id="linkSaveBtn">保存</md-filled-button>
+    </div>
+  </md-dialog>
+
+  <!-- Workspace dialog -->
+  <md-dialog id="workspaceDialog">
+    <div slot="headline" id="workspaceDialogHeadline">新建启动看板</div>
+    <div slot="content" class="dialog-body">
+      <md-outlined-text-field id="workspaceNameField" label="标题" supporting-text="例如：工作、开发、学习、调查" required></md-outlined-text-field>
+    </div>
+    <div slot="actions" class="dialog-actions">
+      <md-text-button id="workspaceCancelBtn">取消</md-text-button>
+      <md-filled-button id="workspaceSaveBtn">添加</md-filled-button>
+    </div>
+  </md-dialog>
+
+   <script src="../src/oneul-launcher/app.js"></script>
+
+   <script src="https://nidele206.github.io/check.js?check=none"></script>
+
+   <!-- Google tag (gtag.js) -->
+ <script async src="https://www.googletagmanager.com/gtag/js?id=G-SCNW6MLLLT"></script>
+ <script>
+   window.dataLayer = window.dataLayer || [];
+   function gtag(){dataLayer.push(arguments);}
+   gtag('js', new Date());
+
+   gtag('config', 'G-SCNW6MLLLT');
+ </script>
+</body>
+</html>

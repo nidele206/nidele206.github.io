@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Easy Flowchart — Mermaid-based Flowchart Editor</title>
+<meta name="description" content="A browser-based flowchart editor with Mermaid support. Open Welcome and projects in tabs and edit projects directly.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a73e8">
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Easy Flowchart — Mermaid-based Flowchart Editor">
+<meta property="og:description" content="Mermaid-based flowchart editor that allows intuitive editing of nodes and arrows by opening Welcome and projects in tabs.">
+<meta property="og:image" content="icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Easy Flowchart — Mermaid-based Flowchart Editor">
+<meta name="twitter:description" content="A Mermaid-based flowchart editor usable in the browser.">
+<link rel="icon" type="image/png" href="../src/easy-flowchart/icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Easy Flowchart","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"A browser-based flowchart editor with Mermaid support.","url":"./"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/easy-flowchart/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar workspace-tabs-bar">
+    <div id="topTabs" class="top-tabs" role="tablist" aria-label="Open tabs"></div>
+    <button id="newTopTabBtn" class="new-top-tab" type="button" title="New tab" aria-label="New tab">
+      <span class="material-icons-round">add</span>
+    </button>
+  </header>
+
+  <!-- Welcome itself is the content of the top-level tab. Opening a project from here changes the current Welcome tab to a project tab. -->
+  <main id="welcomeView" class="welcome-view" hidden>
+    <section class="welcome-shell">
+      <img class="welcome-logo" src="../src/easy-flowchart/icon.png" alt="Easy Flowchart" width="96" height="96">
+      <div class="welcome-eyebrow">Nidele Series</div>
+      <h1>Easy Flowchart</h1>
+      <p>Start with "New Project"</p>
+      <button id="createProjectBtn" class="primary welcome-create" type="button">
+        <span class="material-icons-round">add</span>New Project
+      </button>
+    </section>
+    <section class="project-section" aria-labelledby="projectSectionTitle">
+      <div class="project-section-head">
+        <div>
+          <h2 id="projectSectionTitle">Projects</h2>
+        </div>
+      </div>
+      <div id="projectGrid" class="project-grid"></div>
+      <div id="projectEmpty" class="project-empty" hidden>
+        <span class="material-icons-round">folder_open</span>
+        <strong>No projects yet</strong>
+        <p>You can create from "New Project".</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Project tab content. A project is a single editing document and does not contain file tabs internally. -->
+  <section id="editorView" class="editor-view" hidden>
+    <header class="topbar project-toolbar">
+      <div id="status" class="status">Ready...</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="renameBtn" title="Rename" aria-label="Rename"><span class="material-icons-round">edit</span>Rename</button>
+        <button class="icon-btn" id="undoBtn" title="Undo" aria-label="Undo"><span class="material-icons-round">undo</span></button>
+        <button class="icon-btn" id="redoBtn" title="Redo" aria-label="Redo"><span class="material-icons-round">redo</span></button>
+        <button class="icon-btn" id="previewBtn" title="Mermaid Preview" aria-label="Mermaid Preview"><span class="material-icons-round">play_arrow</span>SVG Preview</button>
+        <button class="icon-btn" id="exportBtn" title="Export SVG" aria-label="Export SVG"><span class="material-icons-round">download</span>Download</button>
+        <button class="icon-btn save-btn" id="saveBtn" title="Manual Save" aria-label="Manual Save"><span class="material-icons-round">save</span>Manual Save</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <div id="canvas" class="canvas">
+        <div class="canvas-grid"></div>
+        <div id="diagram" class="diagram">
+          <svg id="edgesLayer" class="edges-layer"></svg>
+          <button id="selectionAction" class="selection-action" type="button" title="Delete" aria-label="Delete">
+            <span class="material-icons-round">delete</span>
+          </button>
+        </div>
+
+        <button id="addNodeBtn" class="fab" type="button" title="Add Node" aria-label="Add Node">
+          <span class="material-icons-round">add</span>
+          <span>Add Node</span>
+        </button>
+
+        <div class="zoom-info">
+          <button id="zoomOut" title="Zoom Out" aria-label="Zoom Out"><span class="material-icons-round">remove</span></button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button id="zoomIn" title="Zoom In" aria-label="Zoom In"><span class="material-icons-round">add</span></button>
+        </div>
+
+        <div id="minimap" class="minimap"><svg></svg></div>
+
+        <div class="view-controls" aria-label="View controls">
+          <button id="fitBtn" title="Fit to Screen" aria-label="Fit to Screen"><span class="material-icons-round">fit_screen</span></button>
+          <button id="resetViewBtn" title="Reset View" aria-label="Reset View"><span class="material-icons-round">center_focus_strong</span></button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <div id="previewOverlay" class="preview-overlay">
+          <div class="preview-header">
+            <div class="preview-title">Mermaid Preview</div>
+            <button id="closePreview" class="secondary" type="button">
+              <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+              Close
+            </button>
+          </div>
+          <div class="preview-body"><div id="previewContainer" class="preview-container"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button id="propertiesTab" class="panel-tab active" type="button">Properties</button>
+        <button id="codeTab" class="panel-tab" type="button">Mermaid (Beta)</button>
+      </div>
+      <div id="propertiesPanel" class="panel-content"></div>
+      <div id="codePanel" class="panel-content" style="display:none">
+        <div class="code-wrap">
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+          <div class="code-actions">
+            <button id="applyCode" class="primary" type="button">Apply Code</button>
+            <button id="copyCode" class="secondary" type="button">Copy</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</div>
+<script src="https://nidele206.github.io/check.js?check=none"></script>
+<script>
+window.STRINGS={
+  shapeRect:"Rectangle",shapeRound:"Rounded",shapeStadium:"Pill",shapeDiamond:"Diamond",
+  edgeArrow:"Arrow",edgeLine:"Line",edgeDotted:"Dotted",edgeThick:"Thick",edgeCircle:"Circle",edgeCross:"×",
+  newNode:"New Node",nodeDeleted:"Node deleted",edgeDeleted:"Connection deleted",
+  selectExistingNode:"Please select an existing node",duplicateId:"This ID is already in use",
+  invalidPosition:"Please enter a number for position",duplicateEdge:"This connection already exists",
+  unsupportedShapes:"The shapes available in this editor are only Rectangle, Rounded, Pill, and Diamond.",
+  dragToConnect:"Drag to connect",noNodesToDisplay:"No nodes to display",
+  renderingMermaid:"Rendering Mermaid...",svgPreviewElementFailed:"Failed to generate SVG preview element",
+  svgDownloadElementFailed:"Failed to generate SVG download element",svgOutputError:"SVG output error",
+  codeIsEmpty:"Code is empty",codeApplied:"Code applied (avoiding overlap)",
+  mermaidSyntaxError:"Mermaid syntax error",indexedDBNotSupported:"IndexedDB is not available in this browser",
+  untitledProject:"Untitled Project",renameProjectTitle:"Rename",renameProjectAria:"Rename project",
+  deleteProjectTitle:"Delete",deleteProjectAria:"Delete project",closeTabTitle:"Close tab",
+  closeTabAria:"Close tab",saveError:"Save error",autoSaveError:"Auto-save error",
+  projectNamePrompt:"Project name",newProjectPrompt:"New Project",enterName:"Enter name",
+  nodeCopied:"Node copied",connectionCopied:"Connection copied",
+  selectElementToCopy:"Select an element to copy",noCopiedElement:"No copied element",
+  noTargetNode:"No target node",initError:"Initialization error",saved:"Saved",
+  svgExported:"SVG exported",svgExportFailed:"SVG export failed",
+  mermaidSvgEmpty:"Mermaid SVG generation result is empty",mermaidSvgNotFound:"Mermaid SVG element not found",
+  parsingMermaid:"Parsing Mermaid...",positionHint:"Position can be dragged on the canvas. Size is automatically adjusted to fit the content.",
+  edgeLabelSyntaxHint:"Arrow with label is generated with Mermaid's official syntax <code>--&gt;|label|</code>.",
+  connectionHint:"Drag from the connection points on the top, bottom, left, or right of a node to connect while previewing the line.",
+  selectNodeOrEdge:"Select a node or edge to",editProperties:"edit properties.",
+  appName:"Nidele Easy Flowchart",initializingMermaid:"Initializing Mermaid...",
+  initializingIndexedDB:"Initializing IndexedDB...",projectCount:"Projects",nodesEdgesCount:"Nodes / Connections",
+  deleteConfirm:"Delete?",importStart:"Click a node",importProcess:"Drag the points on top, bottom, left, or right",
+  importEnd:"Ready to connect",undo:"Undone",redo:"Redone",
+  label:"Label",shape:"Shape",direction:"Direction",startNode:"Start Node",endNode:"End Node",type:"Type",
+  nodeAdded:"Node added",connectionComplete:"Connected",connectionCanceled:"Connection canceled"
+};
+</script>
+<script type="module" src="../src/easy-flowchart/app.js"></script>
+<noscript><p>This is a Mermaid-based flowchart editor for the browser. Enable JavaScript to open Welcome and projects in tabs.</p></noscript>
+</body>
+</html>

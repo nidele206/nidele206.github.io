@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>आसान फ्लोचार्ट — मरमेड के आधार पर फ्लोचार्ट संपादक</title>
+<meta name="description" content="मरमेड समर्थन के साथ ब्राउज़र-आधारित फ्लोचार्ट संपादक। वेलकम और प्रोजेक्ट को टैब में खोलें और प्रोजेक्ट को सीधे संपादित करें।">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a73e8">
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:title" content="आसान फ्लोचार्ट — मरमेड के आधार पर फ्लोचार्ट संपादक">
+<meta property="og:description" content="वेलकम और प्रोजेक्ट को टैब में खोलकर नोड और तीरों को सहज ढंग से संपादित करने की अनुमति देने वाला मरमेड आधारित फ्लोचार्ट संपादक।">
+<meta property="og:image" content="icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="आसान फ्लोचार्ट — मरमेड के आधार पर फ्लोचार्ट संपादक">
+<meta name="twitter:description" content="ब्राउज़र में उपयोग किए जा सकने वाला मरमेड आधारित फ्लोचार्ट संपादक।">
+<link rel="icon" type="image/png" href="../src/easy-flowchart/icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"आसान फ्लोचार्ट","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"मरमेड समर्थन के साथ ब्राउज़र-आधारित फ्लोचार्ट संपादक।","url":"./"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/easy-flowchart/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar workspace-tabs-bar">
+    <div id="topTabs" class="top-tabs" role="tablist" aria-label="खुले टैब"></div>
+    <button id="newTopTabBtn" class="new-top-tab" type="button" title="नया टैब" aria-label="नया टैब">
+      <span class="material-icons-round">add</span>
+    </button>
+  </header>
+
+  <!-- वेलकम स्वयं सबसे ऊपरी टैब की सामग्री है। यहाँ से प्रोजेक्ट खोलने पर वर्तमान वेलकम टैब प्रोजेक्ट टैब में बदल जाता है। -->
+  <main id="welcomeView" class="welcome-view" hidden>
+    <section class="welcome-shell">
+      <img class="welcome-logo" src="../src/easy-flowchart/icon.png" alt="आसान फ्लोचार्ट" width="96" height="96">
+      <div class="welcome-eyebrow">Nidele Series</div>
+      <h1>आसान फ्लोचार्ट</h1>
+      <p>"नया प्रोजेक्ट" से शुरू करें</p>
+      <button id="createProjectBtn" class="primary welcome-create" type="button">
+        <span class="material-icons-round">add</span>नया प्रोजेक्ट
+      </button>
+    </section>
+    <section class="project-section" aria-labelledby="projectSectionTitle">
+      <div class="project-section-head">
+        <div>
+          <h2 id="projectSectionTitle">प्रोजेक्ट</h2>
+        </div>
+      </div>
+      <div id="projectGrid" class="project-grid"></div>
+      <div id="projectEmpty" class="project-empty" hidden>
+        <span class="material-icons-round">folder_open</span>
+        <strong>अभी तक कोई प्रोजेक्ट नहीं है</strong>
+        <p>आप "नया प्रोजेक्ट" से बना सकते हैं।</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- प्रोजेक्ट टैब की सामग्री। प्रोजेक्ट एक एकल संपादन दस्तावेज़ है और अंदर फ़ाइल टैब नहीं रखता। -->
+  <section id="editorView" class="editor-view" hidden>
+    <header class="topbar project-toolbar">
+      <div id="status" class="status">तैयार...</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="renameBtn" title="नाम बदलें" aria-label="नाम बदलें"><span class="material-icons-round">edit</span>नाम बदलें</button>
+        <button class="icon-btn" id="undoBtn" title="पूर्ववत" aria-label="पूर्ववत"><span class="material-icons-round">undo</span></button>
+        <button class="icon-btn" id="redoBtn" title="दोहराएं" aria-label="दोहराएं"><span class="material-icons-round">redo</span></button>
+        <button class="icon-btn" id="previewBtn" title="मरमेड पूर्वावलोकन" aria-label="मरमेड पूर्वावलोकन"><span class="material-icons-round">play_arrow</span>SVG पूर्वावलोकन</button>
+        <button class="icon-btn" id="exportBtn" title="SVG निकालें" aria-label="SVG निकालें"><span class="material-icons-round">download</span>डाउनलोड</button>
+        <button class="icon-btn save-btn" id="saveBtn" title="मैन्युअल सहेजें" aria-label="मैन्युअल सहेजें"><span class="material-icons-round">save</span>मैन्युअल सहेजें</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <div id="canvas" class="canvas">
+        <div class="canvas-grid"></div>
+        <div id="diagram" class="diagram">
+          <svg id="edgesLayer" class="edges-layer"></svg>
+          <button id="selectionAction" class="selection-action" type="button" title="हटाएं" aria-label="हटाएं">
+            <span class="material-icons-round">delete</span>
+          </button>
+        </div>
+
+        <button id="addNodeBtn" class="fab" type="button" title="नोड जोड़ें" aria-label="नोड जोड़ें">
+          <span class="material-icons-round">add</span>
+          <span>नोड जोड़ें</span>
+        </button>
+
+        <div class="zoom-info">
+          <button id="zoomOut" title="ज़ूम आउट" aria-label="ज़ूम आउट"><span class="material-icons-round">remove</span></button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button id="zoomIn" title="ज़ूम इन" aria-label="ज़ूम इन"><span class="material-icons-round">add</span></button>
+        </div>
+
+        <div id="minimap" class="minimap"><svg></svg></div>
+
+        <div class="view-controls" aria-label="दृश्य नियंत्रण">
+          <button id="fitBtn" title="स्क्रीन में फिट करें" aria-label="स्क्रीन में फिट करें"><span class="material-icons-round">fit_screen</span></button>
+          <button id="resetViewBtn" title="दृश्य रीसेट करें" aria-label="दृश्य रीसेट करें"><span class="material-icons-round">center_focus_strong</span></button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <div id="previewOverlay" class="preview-overlay">
+          <div class="preview-header">
+            <div class="preview-title">मरमेड पूर्वावलोकन</div>
+            <button id="closePreview" class="secondary" type="button">
+              <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+              बंद करें
+            </button>
+          </div>
+          <div class="preview-body"><div id="previewContainer" class="preview-container"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button id="propertiesTab" class="panel-tab active" type="button">गुण</button>
+        <button id="codeTab" class="panel-tab" type="button">मरमेड (बीटा)</button>
+      </div>
+      <div id="propertiesPanel" class="panel-content"></div>
+      <div id="codePanel" class="panel-content" style="display:none">
+        <div class="code-wrap">
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+          <div class="code-actions">
+            <button id="applyCode" class="primary" type="button">कोड लागू करें</button>
+            <button id="copyCode" class="secondary" type="button">कॉपी करें</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</div>
+<script src="https://nidele206.github.io/check.js?check=none"></script>
+<script>
+window.STRINGS={
+  shapeRect:"आयत",shapeRound:"गोलाकार कोने",shapeStadium:"गोल",shapeDiamond:"रोम्बस",
+  edgeArrow:"तीर",edgeLine:"रेखा",edgeDotted:"बिंदुदार",edgeThick:"मोटी",edgeCircle:"वृत्त",edgeCross:"×",
+  newNode:"नया नोड",nodeDeleted:"नोड हटाया गया",edgeDeleted:"कनेक्शन हटाया गया",
+  selectExistingNode:"कृपया एक मौजूदा नोड चुनें",duplicateId:"यह ID पहले से उपयोग में है",
+  invalidPosition:"स्थिति के लिए कृपया एक संख्या दर्ज करें",duplicateEdge:"यह कनेक्शन पहले से मौजूद है",
+  unsupportedShapes:"इस संपादक में उपलब्ध आकृतियाँ केवल आयत, गोलाकार कोने, गोल और रोम्बस हैं।",
+  dragToConnect:"कनेक्ट करने के लिए खींचें",noNodesToDisplay:"दिखाने के लिए कोई नोड नहीं",
+  renderingMermaid:"मरमेड रेंडर हो रहा है...",svgPreviewElementFailed:"SVG पूर्वावलोकन तत्व उत्पन्न करने में विफल",
+  svgDownloadElementFailed:"SVG डाउनलोड तत्व उत्पन्न करने में विफल",svgOutputError:"SVG आउटपुट त्रुटि",
+  codeIsEmpty:"कोड खाली है",codeApplied:"कोड लागू किया गया (ओवरलैप से बचना)",
+  mermaidSyntaxError:"मरमेड सिंटैक्स त्रुटि",indexedDBNotSupported:"इस ब्राउज़र में IndexedDB उपलब्ध नहीं है",
+  untitledProject:"बिना शीर्षक प्रोजेक्ट",renameProjectTitle:"नाम बदलें",renameProjectAria:"प्रोजेक्ट का नाम बदलें",
+  deleteProjectTitle:"हटाएं",deleteProjectAria:"प्रोजेक्ट हटाएं",closeTabTitle:"टैब बंद करें",
+  closeTabAria:"टैब बंद करें",saveError:"सहेजने में त्रुटि",autoSaveError:"ऑटो-सहेजने में त्रुटि",
+  projectNamePrompt:"प्रोजेक्ट का नाम",newProjectPrompt:"नया प्रोजेक्ट",enterName:"नाम दर्ज करें",
+  nodeCopied:"नोड कॉपी किया गया",connectionCopied:"कनेक्शन कॉपी किया गया",
+  selectElementToCopy:"कॉपी करने के लिए एक तत्व चुनें",noCopiedElement:"कोई कॉपी किया गया तत्व नहीं",
+  noTargetNode:"कोई लक्ष्य नोड नहीं",initError:"प्रारंभीकरण त्रुटि",saved:"सहेजा गया",
+  svgExported:"SVG निर्यात किया गया",svgExportFailed:"SVG निर्यात विफल",
+  mermaidSvgEmpty:"मरमेड SVG उत्पादन परिणाम खाली है",mermaidSvgNotFound:"मरमेड SVG तत्व नहीं मिला",
+  parsingMermaid:"मरमेड का विश्लेषण हो रहा है...",positionHint:"स्थिति कैनवास पर खींची जा सकती है। आकार सामग्री के अनुसिए स्वचालित रूप से समायोजित होता है।",
+  edgeLabelSyntaxHint:"लेबल वाला तीर मरमेड के आधिकारिक सिंटैक्स <code>--&gt;|label|</code> से उत्पन्न होता है।",
+  connectionHint:"नोड के ऊपर, नीचे, बाईं या दाईं ओर के कनेक्शन बिंदुओं से खींचें ताकि लाइन को पूर्वावलोकन करते हुए कनेक्ट किया जा सके।",
+  selectNodeOrEdge:"एक नोड या कनेक्शन चुनें ताकि",editProperties:"गुण संपादित करें।",
+  appName:"Nidele आसान फ्लोचार्ट",initializingMermaid:"मरमेड को प्रारंभ हो रहा है...",
+  initializingIndexedDB:"IndexedDB को प्रारंभ हो रहा है...",projectCount:"प्रोजेक्ट",nodesEdgesCount:"नोड / कनेक्शन",
+  deleteConfirm:"हटाएं?",importStart:"एक नोड पर क्लिक करें",importProcess:"ऊपर, नीचे, बाईं या दाईं ओर के बिंदुओं को खींचें",
+  importEnd:"कनेक्ट करने के लिए तैयार",undo:"पूर्ववत किया गया",redo:"दोहराया गया",
+  label:"लेबल",shape:"आकृति",direction:"दिशा",startNode:"प्रारंभ नोड",endNode:"समापन नोड",type:"प्रकार",
+  nodeAdded:"नोड जोड़ा गया",connectionComplete:"कनेक्ट किया गया",connectionCanceled:"कनेक्शन रद्द किया गया"
+};
+</script>
+<script type="module" src="../src/easy-flowchart/app.js"></script>
+<noscript><p>यह ब्राउज़र के लिए मरमेड आधारित फ्लोचार्ट संपादक है। JavaScript सक्षम करने पर वेलकम और प्रोजेक्ट को टैब में खोला जा सकता है।</p></noscript>
+</body>
+</html>

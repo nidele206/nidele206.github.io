@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>쉬운 흐름도 — Mermaid 기반 흐름도 편집기</title>
+<meta name="description" content="Mermaid를 지원하는 브라우저 기반 흐름도 편집기입니다. Welcome과 프로젝트를 탭으로 열고 프로젝트를 바로 편집할 수 있습니다.">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a73e8">
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:title" content="쉬운 흐름도 — Mermaid 기반 흐름도 편집기">
+<meta property="og:description" content="Welcome과 프로젝트를 탭으로 열어 노드와 화살표를 직관적으로 편집할 수 있는 Mermaid 기반 흐름도 편집기입니다.">
+<meta property="og:image" content="icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="쉬운 흐름도 — Mermaid 기반 흐름도 편집기">
+<meta name="twitter:description" content="브라우저에서 사용할 수 있는 Mermaid 기반 흐름도 편집기입니다.">
+<link rel="icon" type="image/png" href="../src/easy-flowchart/icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"쉬운 흐름도","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"Mermaid를 지원하는 브라우저 기반 흐름도 편집기입니다.","url":"./"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/easy-flowchart/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar workspace-tabs-bar">
+    <div id="topTabs" class="top-tabs" role="tablist" aria-label="열린 탭"></div>
+    <button id="newTopTabBtn" class="new-top-tab" type="button" title="새 탭" aria-label="새 탭">
+      <span class="material-icons-round">add</span>
+    </button>
+  </header>
+
+  <!-- Welcome 자체가 최상위 탭의 내용입니다. 여기서 프로젝트를 열면 현재 Welcome 탭이 프로젝트 탭으로 바뀝니다. -->
+  <main id="welcomeView" class="welcome-view" hidden>
+    <section class="welcome-shell">
+      <img class="welcome-logo" src="../src/easy-flowchart/icon.png" alt="쉬운 흐름도" width="96" height="96">
+      <div class="welcome-eyebrow">Nidele Series</div>
+      <h1>쉬운 흐름도</h1>
+      <p>"새 프로젝트"로 시작하십시오</p>
+      <button id="createProjectBtn" class="primary welcome-create" type="button">
+        <span class="material-icons-round">add</span>새 프로젝트
+      </button>
+    </section>
+    <section class="project-section" aria-labelledby="projectSectionTitle">
+      <div class="project-section-head">
+        <div>
+          <h2 id="projectSectionTitle">프로젝트</h2>
+        </div>
+      </div>
+      <div id="projectGrid" class="project-grid"></div>
+      <div id="projectEmpty" class="project-empty" hidden>
+        <span class="material-icons-round">folder_open</span>
+        <strong>아직 프로젝트가 없습니다</strong>
+        <p>"새 프로젝트"에서 만들 수 있습니다.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 프로젝트 탭의 내용입니다. 프로젝트는 하나의 편집 문서이며 내부에 파일 탭을 갖지 않습니다. -->
+  <section id="editorView" class="editor-view" hidden>
+    <header class="topbar project-toolbar">
+      <div id="status" class="status">준비 중...</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="renameBtn" title="이름 변경" aria-label="이름 변경"><span class="material-icons-round">edit</span>이름 변경</button>
+        <button class="icon-btn" id="undoBtn" title="되돌리기" aria-label="되돌리기"><span class="material-icons-round">undo</span></button>
+        <button class="icon-btn" id="redoBtn" title="다시 하기" aria-label="다시 하기"><span class="material-icons-round">redo</span></button>
+        <button class="icon-btn" id="previewBtn" title="Mermaid 미리보기" aria-label="Mermaid 미리보기"><span class="material-icons-round">play_arrow</span>SVG 미리보기</button>
+        <button class="icon-btn" id="exportBtn" title="SVG 내보내기" aria-label="SVG 내보내기"><span class="material-icons-round">download</span>다운로드</button>
+        <button class="icon-btn save-btn" id="saveBtn" title="수동 저장" aria-label="수동 저장"><span class="material-icons-round">save</span>수동 저장</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <div id="canvas" class="canvas">
+        <div class="canvas-grid"></div>
+        <div id="diagram" class="diagram">
+          <svg id="edgesLayer" class="edges-layer"></svg>
+          <button id="selectionAction" class="selection-action" type="button" title="삭제" aria-label="삭제">
+            <span class="material-icons-round">delete</span>
+          </button>
+        </div>
+
+        <button id="addNodeBtn" class="fab" type="button" title="노드 추가" aria-label="노드 추가">
+          <span class="material-icons-round">add</span>
+          <span>노드 추가</span>
+        </button>
+
+        <div class="zoom-info">
+          <button id="zoomOut" title="축소" aria-label="축소"><span class="material-icons-round">remove</span></button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button id="zoomIn" title="확대" aria-label="확대"><span class="material-icons-round">add</span></button>
+        </div>
+
+        <div id="minimap" class="minimap"><svg></svg></div>
+
+        <div class="view-controls" aria-label="보기 조작">
+          <button id="fitBtn" title="전체 화면" aria-label="전체 화면"><span class="material-icons-round">fit_screen</span></button>
+          <button id="resetViewBtn" title="보기 재설정" aria-label="보기 재설정"><span class="material-icons-round">center_focus_strong</span></button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <div id="previewOverlay" class="preview-overlay">
+          <div class="preview-header">
+            <div class="preview-title">Mermaid 미리보기</div>
+            <button id="closePreview" class="secondary" type="button">
+              <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+              닫기
+            </button>
+          </div>
+          <div class="preview-body"><div id="previewContainer" class="preview-container"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button id="propertiesTab" class="panel-tab active" type="button">속성</button>
+        <button id="codeTab" class="panel-tab" type="button">Mermaid (Beta)</button>
+      </div>
+      <div id="propertiesPanel" class="panel-content"></div>
+      <div id="codePanel" class="panel-content" style="display:none">
+        <div class="code-wrap">
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+          <div class="code-actions">
+            <button id="applyCode" class="primary" type="button">코드 적용</button>
+            <button id="copyCode" class="secondary" type="button">복사</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</div>
+<script src="https://nidele206.github.io/check.js?check=none"></script>
+<script>
+window.STRINGS={
+  shapeRect:"사각형",shapeRound:"둥근 모서리",shapeStadium:"알",shapeDiamond:"다이아몬드",
+  edgeArrow:"화살표",edgeLine:"선",edgeDotted:"점선",edgeThick:"두꺼운 선",edgeCircle:"원",edgeCross:"×",
+  newNode:"새 노드",nodeDeleted:"노드가 삭제되었습니다",edgeDeleted:"연결이 삭제되었습니다",
+  selectExistingNode:"기존 노드를 선택하십시오",duplicateId:"해당 ID가 이미 사용 중입니다",
+  invalidPosition:"위치에 숫자를 입력하십시오",duplicateEdge:"같은 연결이 이미 있습니다",
+  unsupportedShapes:"이 편집기에서 사용할 수 있는 모양은 사각형, 둥근 모서리, 알, 다이아몬드만입니다.",
+  dragToConnect:"드래그하여 연결",noNodesToDisplay:"표시할 노드가 없습니다",
+  renderingMermaid:"Mermaid를 렌더링 중...",svgPreviewElementFailed:"SVG 미리보기 요소 생성 실패",
+  svgDownloadElementFailed:"SVG 다운로드 요소 생성 실패",svgOutputError:"SVG 출력 오류",
+  codeIsEmpty:"코드가 비어 있습니다",codeApplied:"코드가 적용되었습니다 (겹침 방지)",
+  mermaidSyntaxError:"Mermaid 구문 오류",indexedDBNotSupported:"이 브라우저에서는 IndexedDB를 사용할 수 없습니다",
+  untitledProject:"무제 프로젝트",renameProjectTitle:"이름 변경",renameProjectAria:"프로젝트 이름 변경",
+  deleteProjectTitle:"삭제",deleteProjectAria:"프로젝트 삭제",closeTabTitle:"탭 닫기",
+  closeTabAria:"탭 닫기",saveError:"저장 오류",autoSaveError:"자동 저장 오류",
+  projectNamePrompt:"프로젝트 이름",newProjectPrompt:"새 프로젝트",enterName:"이름을 입력하십시오",
+  nodeCopied:"노드가 복사되었습니다",connectionCopied:"연결이 복사되었습니다",
+  selectElementToCopy:"복사할 요소를 선택하십시오",noCopiedElement:"복사한 요소가 없습니다",
+  noTargetNode:"대상 노드가 없습니다",initError:"초기화 오류",saved:"저장되었습니다",
+  svgExported:"SVG가 내보내졌습니다",svgExportFailed:"SVG 내보내기 실패",
+  mermaidSvgEmpty:"Mermaid SVG 생성 결과가 비어 있습니다",mermaidSvgNotFound:"Mermaid SVG 요소를 찾을 수 없습니다",
+  parsingMermaid:"Mermaid를 분석 중...",positionHint:"위치는 캔버스에서 드래그할 수 있습니다. 크기는 내용에 맞춰 자동 조정됩니다.",
+  edgeLabelSyntaxHint:"레이블이 있는 화살표는 Mermaid의 공식 구문 <code>--&gt;|label|</code>로 생성됩니다.",
+  connectionHint:"노드의 위, 아래, 왼쪽, 오른쪽에 있는 연결 지점에서 드래그하면 선을 미리 보면서 연결할 수 있습니다.",
+  selectNodeOrEdge:"노드 또는 연결을 선택하면",editProperties:"속성을 편집할 수 있습니다.",
+  appName:"Nidele 쉬운 흐름도",initializingMermaid:"Mermaid를 초기화 중...",
+  initializingIndexedDB:"IndexedDB를 초기화 중...",projectCount:"프로젝트",nodesEdgesCount:"노드 / 연결",
+  deleteConfirm:"삭제하시겠습니까?",importStart:"노드를 클릭",importProcess:"위, 아래, 왼쪽, 오른쪽 점을 드래그",
+  importEnd:"연결 가능",undo:"되돌렸습니다",redo:"다시 했습니다",
+  label:"레이블",shape:"모양",direction:"방향",startNode:"시작 노드",endNode:"종료 노드",type:"종류",
+  nodeAdded:"노드가 추가되었습니다",connectionComplete:"연결되었습니다",connectionCanceled:"연결이 취소되었습니다"
+};
+</script>
+<script type="module" src="../src/easy-flowchart/app.js"></script>
+<noscript><p>브라우저용 Mermaid 기반 흐름도 편집기입니다. JavaScript를 활성화하면 Welcome과 프로젝트를 탭으로 열 수 있습니다.</p></noscript>
+</body>
+</html>
+<script>(()=>{const FONT_URL = 'https://search3958.github.io/project/chrm.ttf';const FONT_FAMILY = 'ChrmFontForce';const style = document.createElement('style');style.textContent = ` @font-face{font-family:"${FONT_FAMILY}";src:url("${FONT_URL}")format("truetype");font-weight:normal;font-style:normal;font-display:block;}*:not(span[slot="icon"]):not(.material-icons-round):not(.material-symbols-outlined):not(span[slot="icon"] *):not(.material-icons-round *):not(.material-symbols-outlined *){font-family:"${FONT_FAMILY}",sans-serif !important;}`;document.head.appendChild(style);const shouldSkip =(el)=>{const isTarget = e =>(e.tagName === 'SPAN' && e.getAttribute('slot')=== 'icon')|| e.classList.contains('material-icons-round')|| e.classList.contains('material-symbols-outlined');if(isTarget(el))return true;for(let p = el.parentElement;p;p = p.parentElement){if(isTarget(p))return true;}return false;};const applyForce =()=>{document.querySelectorAll('*').forEach(el =>{if(shouldSkip(el)){el.style.removeProperty('font-family');return;}el.style.setProperty('font-family',`"${FONT_FAMILY}",sans-serif`,'important');});};const observer = new MutationObserver(applyForce);observer.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['slot','class']});document.fonts.ready.then(applyForce);applyForce();})();</script>

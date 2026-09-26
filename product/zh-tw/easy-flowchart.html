@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>簡易流程圖 — 基於Mermaid的流程圖編輯器</title>
+<meta name="description" content="支援Mermaid的瀏覽器端流程圖編輯器。以分頁方式開啟Welcome和專案，並可直接編輯專案。">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#1a73e8">
+<link rel="canonical" href="./">
+<meta property="og:type" content="website">
+<meta property="og:title" content="簡易流程圖 — 基於Mermaid的流程圖編輯器">
+<meta property="og:description" content="以分頁方式開啟Welcome和專案，能直覺編輯節點和箭頭的Mermaid基礎流程圖編輯器。">
+<meta property="og:image" content="icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="簡易流程圖 — 基於Mermaid的流程圖編輯器">
+<meta name="twitter:description" content="可在瀏覽器中使用的Mermaid基礎流程圖編輯器。">
+<link rel="icon" type="image/png" href="../src/easy-flowchart/icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"簡易流程圖","applicationCategory":"DesignApplication","operatingSystem":"Web Browser","description":"支援Mermaid的瀏覽器端流程圖編輯器。","url":"./"}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Material+Icons+Round&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../src/easy-flowchart/style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar workspace-tabs-bar">
+    <div id="topTabs" class="top-tabs" role="tablist" aria-label="開啟的分頁"></div>
+    <button id="newTopTabBtn" class="new-top-tab" type="button" title="新分頁" aria-label="新分頁">
+      <span class="material-icons-round">add</span>
+    </button>
+  </header>
+
+  <!-- Welcome本身即為最上層分頁的內容。從這裡開啟專案會將目前的Welcome分頁改為專案分頁。 -->
+  <main id="welcomeView" class="welcome-view" hidden>
+    <section class="welcome-shell">
+      <img class="welcome-logo" src="../src/easy-flowchart/icon.png" alt="簡易流程圖" width="96" height="96">
+      <div class="welcome-eyebrow">Nidele Series</div>
+      <h1>簡易流程圖</h1>
+      <p>從「新專案」開始</p>
+      <button id="createProjectBtn" class="primary welcome-create" type="button">
+        <span class="material-icons-round">add</span>新專案
+      </button>
+    </section>
+    <section class="project-section" aria-labelledby="projectSectionTitle">
+      <div class="project-section-head">
+        <div>
+          <h2 id="projectSectionTitle">專案</h2>
+        </div>
+      </div>
+      <div id="projectGrid" class="project-grid"></div>
+      <div id="projectEmpty" class="project-empty" hidden>
+        <span class="material-icons-round">folder_open</span>
+        <strong>目前沒有專案</strong>
+        <p>可以從「新專案」建立。</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- 專案分頁的內容。專案是一個編輯文件，內部不包含檔案分頁。 -->
+  <section id="editorView" class="editor-view" hidden>
+    <header class="topbar project-toolbar">
+      <div id="status" class="status">準備中...</div>
+      <div class="top-actions">
+        <button class="icon-btn" id="renameBtn" title="改名" aria-label="改名"><span class="material-icons-round">edit</span>改名</button>
+        <button class="icon-btn" id="undoBtn" title="復原" aria-label="復原"><span class="material-icons-round">undo</span></button>
+        <button class="icon-btn" id="redoBtn" title="重做" aria-label="重做"><span class="material-icons-round">redo</span></button>
+        <button class="icon-btn" id="previewBtn" title="Mermaid預覽" aria-label="Mermaid預覽"><span class="material-icons-round">play_arrow</span>SVG 預覽</button>
+        <button class="icon-btn" id="exportBtn" title="輸出SVG" aria-label="輸出SVG"><span class="material-icons-round">download</span>下載</button>
+        <button class="icon-btn save-btn" id="saveBtn" title="手動儲存" aria-label="手動儲存"><span class="material-icons-round">save</span>手動儲存</button>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <div id="canvas" class="canvas">
+        <div class="canvas-grid"></div>
+        <div id="diagram" class="diagram">
+          <svg id="edgesLayer" class="edges-layer"></svg>
+          <button id="selectionAction" class="selection-action" type="button" title="刪除" aria-label="刪除">
+            <span class="material-icons-round">delete</span>
+          </button>
+        </div>
+
+        <button id="addNodeBtn" class="fab" type="button" title="新增節點" aria-label="新增節點">
+          <span class="material-icons-round">add</span>
+          <span>新增節點</span>
+        </button>
+
+        <div class="zoom-info">
+          <button id="zoomOut" title="縮小" aria-label="縮小"><span class="material-icons-round">remove</span></button>
+          <div id="zoomValue" class="zoom-value">100%</div>
+          <button id="zoomIn" title="放大" aria-label="放大"><span class="material-icons-round">add</span></button>
+        </div>
+
+        <div id="minimap" class="minimap"><svg></svg></div>
+
+        <div class="view-controls" aria-label="檢視操作">
+          <button id="fitBtn" title="完整顯示" aria-label="完整顯示"><span class="material-icons-round">fit_screen</span></button>
+          <button id="resetViewBtn" title="重置檢視" aria-label="重置檢視"><span class="material-icons-round">center_focus_strong</span></button>
+        </div>
+
+        <div id="toast" class="toast"></div>
+
+        <div id="previewOverlay" class="preview-overlay">
+          <div class="preview-header">
+            <div class="preview-title">Mermaid 預覽</div>
+            <button id="closePreview" class="secondary" type="button">
+              <span class="material-icons-round" style="font-size:18px;vertical-align:-4px">close</span>
+              關閉
+            </button>
+          </div>
+          <div class="preview-body"><div id="previewContainer" class="preview-container"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-panel">
+      <div class="panel-tabs">
+        <button id="propertiesTab" class="panel-tab active" type="button">屬性</button>
+        <button id="codeTab" class="panel-tab" type="button">Mermaid (Beta)</button>
+      </div>
+      <div id="propertiesPanel" class="panel-content"></div>
+      <div id="codePanel" class="panel-content" style="display:none">
+        <div class="code-wrap">
+          <textarea id="codeEditor" class="code-editor" spellcheck="false"></textarea>
+          <div class="code-actions">
+            <button id="applyCode" class="primary" type="button">套用程式碼</button>
+            <button id="copyCode" class="secondary" type="button">複製</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</div>
+<script src="https://nidele206.github.io/check.js?check=none"></script>
+<script>
+window.STRINGS={
+  shapeRect:"矩形",shapeRound:"圓角",shapeStadium:"胶囊",shapeDiamond:"菱形",
+  edgeArrow:"箭頭",edgeLine:"線",edgeDotted:"虛線",edgeThick:"粗線",edgeCircle:"圓",edgeCross:"×",
+  newNode:"新節點",nodeDeleted:"節點已刪除",edgeDeleted:"連接已刪除",
+  selectExistingNode:"請選擇現有節點",duplicateId:"此ID已被使用",
+  invalidPosition:"請輸入數值作為位置",duplicateEdge:"此連接已存在",
+  unsupportedShapes:"此編輯器中可用的形狀僅有：矩形、圓角、胶囊、菱形。",
+  dragToConnect:"拖拽以連接",noNodesToDisplay:"沒有可顯示的節點",
+  renderingMermaid:"正在渲染Mermaid...",svgPreviewElementFailed:"無法生成SVG預覽元素",
+  svgDownloadElementFailed:"無法生成SVG下載元素",svgOutputError:"SVG輸出錯誤",
+  codeIsEmpty:"程式碼為空",codeApplied:"程式碼已套用（避免重疊）",
+  mermaidSyntaxError:"Mermaid語法錯誤",indexedDBNotSupported:"此瀏覽器不支援IndexedDB",
+  untitledProject:"無標題專案",renameProjectTitle:"改名",renameProjectAria:"變更專案名稱",
+  deleteProjectTitle:"刪除",deleteProjectAria:"刪除專案",closeTabTitle:"關閉分頁",
+  closeTabAria:"關閉分頁",saveError:"儲存錯誤",autoSaveError:"自動儲存錯誤",
+  projectNamePrompt:"專案名稱",newProjectPrompt:"新專案",enterName:"請輸入名稱",
+  nodeCopied:"節點已複製",connectionCopied:"連接已複製",
+  selectElementToCopy:"選擇要複製的元素",noCopiedElement:"沒有複製的元素",
+  noTargetNode:"沒有目標節點",initError:"初始化錯誤",saved:"已儲存",
+  svgExported:"SVG已輸出",svgExportFailed:"SVG輸出失敗",
+  mermaidSvgEmpty:"Mermaid的SVG生成結果為空",mermaidSvgNotFound:"找不到Mermaid SVG元素",
+  parsingMermaid:"正在解析Mermaid...",positionHint:"位置可以在畫布上拖拽。大小會根據內容自動調整。",
+  edgeLabelSyntaxHint:"帶標籤的箭頭使用Mermaid的正式語法 <code>--&gt;|標籤|</code> 生成。",
+  connectionHint:"從節點上下左右的連接點拖拽，可以在預覽線條的同時進行連接。",
+  selectNodeOrEdge:"選擇節點或連接後",editProperties:"可以編輯屬性。",
+  appName:"Nidele 簡易流程圖",initializingMermaid:"正在初始化Mermaid...",
+  initializingIndexedDB:"正在初始化IndexedDB...",projectCount:"專案",nodesEdgesCount:"節點 / 連接",
+  deleteConfirm:"要刪除嗎？",importStart:"點擊節點",importProcess:"拖拽上下左右的點",
+  importEnd:"可連接",undo:"已復原",redo:"已重做",
+  label:"標籤",shape:"形狀",direction:"方向",startNode:"開始節點",endNode:"結束節點",type:"種類",
+  nodeAdded:"節點已新增",connectionComplete:"已連接",connectionCanceled:"連接已取消"
+};
+</script>
+<script type="module" src="../src/easy-flowchart/app.js"></script>
+<noscript><p>這是基於Mermaid的瀏覽器端流程圖編輯器。啟用JavaScript後可以分頁方式開啟Welcome和專案。</p></noscript>
+</body>
+</html>
