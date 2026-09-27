@@ -124,7 +124,7 @@ header {
 
 .float-icon {
     position: absolute;
-    width: 40vw;
+    width: 30vw;
     max-width: 30vh;
     height: auto;
     opacity: 0;
@@ -139,11 +139,11 @@ header {
         transform: translateY(40px) scale(0.5);
     }
     60% {
-        opacity: 0.55;
+        opacity: 0.9;
         transform: translateY(-4px) scale(1.05);
     }
     100% {
-        opacity: 0.55;
+        opacity: 0.9;
         transform: translateY(0) scale(1);
     }
 }
@@ -166,13 +166,13 @@ header {
 
 .float-icon-2 {
     top: 20%;
-    right: 10%;
+    right: 3%;
     animation: icon-enter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s forwards,
                float 6s ease-in-out 1.8s infinite;
 }
 
 .float-icon-3 {
-    bottom: -10%;
+    bottom: -15%;
     left: 10%;
     animation: icon-enter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.9s forwards,
                float 6s ease-in-out 2.1s infinite;
@@ -190,7 +190,7 @@ header {
         transform: translateY(40px) scale(0.5);
     }
     to {
-        opacity: 0.55;
+        opacity: 0.9;
         transform: translateY(0) scale(1);
     }
 }
@@ -218,6 +218,10 @@ header {
     font-weight: 700;
     color: #000;
     text-align: center;
+    opacity: 0;
+    transform: translateY(40px);
+    filter: drop-shadow(0 0 6px #eee);
+    animation: slide-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s forwards;
 }
 
 .creative-message b.accent {
@@ -230,12 +234,32 @@ header {
     width: clamp(360px, 46vw, 631px);
     margin: 28px auto 0;
     font-size: clamp(28px, 5vw, 64px);
-    opacity: 1;
-    transform: scale(1);
+    opacity: 0;
+    transform: translateY(40px);
+    animation: slide-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s forwards;
     text-align: center;
+    filter: drop-shadow(0 0 6px #eee);
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (prefers-reduced-motion:reduce) {
+    .creative-message,
+    .creative-title {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important
+    }
+
     .creative-intro::before {
         animation: none !important;
         transform: translateY(-50%) scale(1) !important
@@ -268,7 +292,7 @@ header {
 
 .small {
     font-size: 16px;
-    opacity: 0.7;
+    opacity: 0.9;
     transition: 1.5s all cubic-bezier(1, 0, .18, 1);
     padding-top: 0;
     font-weight: 400;
@@ -289,7 +313,7 @@ header {
     filter: blur(0px);
     display: block;
     transform: translateY(0px);
-    transition-delay: 0.7s
+    transition-delay: 0.9s
 }
 
 .message.before {
@@ -371,12 +395,10 @@ header {
     margin: 0 auto;
     font-size: 40px;
     font-weight: 700;
-    font-variation-settings: "slnt"0, "wdth"120, "GRAD"0, "ROND"24
 }
-
-h3.product-title {
-    font-size: 24px;
-    margin-top: 16px
+.product-title span {
+    font-weight: 400;
+    opacity:0.5;
 }
 
 .product-grid {
@@ -478,7 +500,7 @@ footer {
 }
 
 #lang-current-text {
-    font-size: 16px;
+    font-size: 18px;
     color: #fff;
     white-space: nowrap;
 }
@@ -492,7 +514,7 @@ footer {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 12px 14px;
     border: none;
     border-radius: 100px;
     background: #fff;
@@ -638,24 +660,13 @@ footer {
            Existing Products
            ===================================================== -->
 
-      <section class="product-section">
+<section class="product-section">
 
 <h2 class="product-title">
-           ようこそ
-         </h2>
+            プロダクト<span>より良い生活のために</span>
+          </h2>
 
-        <h3 class="product-title">
-           Web
-         </h3>
-
-        <div class="product-grid">
-
-          <a class="product-link" href="https://nidele206.github.io/product/LANGUAGE/oneul-launcher"><img src="https://nidele206.github.io/imgs/oneul-launcher.png" alt="Oneul launcher"><span class="product-label">Oneul launcher</span></a>
-
-          <a class="product-link" href="https://nidele206.github.io/product/LANGUAGE/wo-checker"><img src="https://nidele206.github.io/imgs/wo-checker.png" alt="Wo Checker"><span class="product-label">Wo Checker</span></a>
-
-          <a class="product-link" href="https://nidele206.github.io/product/LANGUAGE/easy-flowchart"><img src="https://nidele206.github.io/imgs/easy-flowchart.png" alt="Easy Flowchart"><span class="product-label">Easy Flowchart</span></a>
-
+        <div class="product-grid" id="product-grid">
         </div>
 
       </section>
@@ -732,7 +743,7 @@ footer {
     ></script>
 
     <script
-      src="https://nidele206.github.io/check.js?check=none"
+      src="check.js?check=none"
     ></script>
 
   </body>
