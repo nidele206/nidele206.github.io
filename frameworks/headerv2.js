@@ -16,421 +16,314 @@ const BACKDROP_ID = "headerv2-backdrop";
 const MOBILE_BREAKPOINT = 680;
 
 const I18N = {
-ja: {
-header: {
-products: "プロダクト",
-saetab: "SaeTab 7",
-firstGoal: "第一目標",
-support: "サポートと情報",
-menu: "メニュー",
-close: "閉じる",
-back: "戻る",
-home: "ホーム"
-},
-footer: {
-policies: "利用規約と個人情報政策",
-language: "言語",
-github: "GitHub",
-notice: "信頼されるサービスを目指しておりますが、高校生ゆえ不手際があるかもしれません\nその際はお問い合わせフォームよりご指摘いただけますと幸いです"
-},
-menus: {
-saetab: {
-title: "SaeTab 7",
-items: [
-"SaeTab 7について知る",
-"設定方法",
-"今すぐ試す"
-]
-},
-products: {
-title: "プロダクト",
-items: [
-"プロダクト一覧",
-"ツール",
-"BaramOS",
-"私のGoogle Play",
-"ロゴ",
-"Nidele Series"
-]
-},
-support: {
-title: "サポートと情報",
-items: [
-"サポート",
-"私のGitHub",
-"問い合わせ",
-"利用規約および個人情報政策",
-"Language"
-]
-}
-}
-},
+  ja: {
+    header: {
+      products: "Sentaro系列",
+      firstGoal: "Nidele",
+      support: "サポートと情報",
+      menu: "メニュー",
+      close: "閉じる",
+      back: "戻る",
+      home: "ホーム"
+    },
+    footer: {
+      policies: "利用規約と個人情報処理政策",
+      language: "言語",
+      github: "GitHub",
+      notice: "信頼されるサービスを目指しておりますが、高校生ゆえ不手際があるかもしれません\nその際はお問い合わせフォームよりご指摘いただけますと幸いです"
+    },
+    menus: {
+      products: {
+        title: "プロダクト",
+        items: [
+          "Sentaroについて",
+          "プロダクト一覧",
+          "第一目標"
+        ]
+      },
+      support: {
+        title: "サポートと情報",
+        items: [
+          "サポート",
+          "私のGitHub",
+          "問い合わせ",
+          "利用規約と個人情報処理政策"
+      ]
+      }
+    }
+  },
 
-en: {
-header: {
-products: "Products",
-saetab: "SaeTab 7",
-firstGoal: "First Goal",
-support: "Support & Info",
-menu: "Menu",
-close: "Close",
-back: "Back",
-home: "Home"
-},
-footer: {
-policies: "Terms & Privacy Policy",
-language: "Language",
-github: "GitHub",
-notice: "We aim to provide a service you can trust, but as a high school student, I may make mistakes or oversights.\nIf you notice any issues, I would appreciate it if you could let me know through the contact form."
-},
-menus: {
-saetab: {
-title: "SaeTab 7",
-items: [
-"About SaeTab 7",
-"Setup Guide",
-"Try It Now"
-]
-},
-products: {
-title: "Products",
-items: [
-"All Products",
-"Tools",
-"BaramOS",
-"My Google Play",
-"Logos",
-"Nidele Series"
-]
-},
-support: {
-title: "Support & Info",
-items: [
-"Support",
-"My GitHub",
-"Contact",
-"Terms & Privacy Policy",
-"Language"
-]
-}
-}
-},
+  en: {
+    header: {
+      products: "Sentaro Series",
+      firstGoal: "Nidele",
+      support: "Support & Info",
+      menu: "Menu",
+      close: "Close",
+      back: "Back",
+      home: "Home"
+    },
+    footer: {
+      policies: "Terms & Privacy Policy",
+      language: "Language",
+      github: "GitHub",
+      notice: "We aim to provide a service you can trust, but as a high school student, I may make mistakes or oversights.\nIf you notice any issues, I would appreciate it if you could let me know through the contact form."
+    },
+    menus: {
+      products: {
+        title: "Products",
+        items: [
+          "About Sentaro",
+          "Products",
+          "First Goal"
+        ]
+      },
+      support: {
+        title: "Support & Info",
+        items: [
+          "Support",
+          "My GitHub",
+          "Contact",
+          "Terms & Privacy Policy"
+      ]
+      }
+    }
+  },
 
-ko: {
-header: {
-products: "프로덕트",
-saetab: "SaeTab 7",
-firstGoal: "첫 목표",
-support: "지원 및 정보",
-menu: "메뉴",
-close: "닫기",
-back: "뒤로",
-home: "홈"
-},
-footer: {
-policies: "이용약관 및 개인정보 정책",
-language: "언어",
-github: "GitHub",
-notice: "신뢰받는 서비스를 만들기 위해 노력하고 있지만, 고등학생인 만큼 미흡한 점이 있을 수 있습니다.\n그러한 경우 문의 양식을 통해 지적해 주시면 감사하겠습니다."
-},
-menus: {
-saetab: {
-title: "SaeTab 7",
-items: [
-"SaeTab 7 알아보기",
-"설정 방법",
-"지금 사용해 보기"
-]
-},
-products: {
-title: "프로덕트",
-items: [
-"프로덕트 목록",
-"도구",
-"BaramOS",
-"내 Google Play",
-"로고",
-"니델레 시리즈"
-]
-},
-support: {
-title: "지원 및 정보",
-items: [
-"지원",
-"봉사자용 원시 프로그람",
-"문의",
-"이용약관 및 개인정보 정책",
-"언어"
-]
-}
-}
-},
+  kr: {
+    header: {
+      products: "프로덕트",
+      firstGoal: "Nidele",
+      support: "지원 및 정보",
+      menu: "메뉴",
+      close: "닫기",
+      back: "뒤로",
+      home: "홈"
+    },
+    footer: {
+      policies: "이용약관과 개인정보 처리 정책",
+      language: "언어",
+      github: "GitHub",
+      notice: "신뢰받는 서비스를 만들기 위해 노력하고 있지만, 고등학생인 만큼 미흡한 점이 있을 수 있습니다.\n그러한 경우 문의 양식을 통해 지적해 주시면 감사하겠습니다."
+    },
+    menus: {
+      products: {
+        title: "프로덕트",
+        items: [
+          "Sentaro에 대해",
+          "프로덕트 목록",
+          "첫 번째 목표"
+        ]
+      },
+      support: {
+        title: "지원 및 정보",
+        items: [
+          "지원",
+          "봉사자용 원시 프로그람",
+          "문의",
+          "이용약관과 개인정보 처리 정책"
+      ]
+      }
+    }
+  },
 
-"ko-kp": {
-header: {
-products: "제품",
-saetab: "앞길7",
-firstGoal: "우리 정젝사상",
-support: "지원과 정보",
-menu: "메뉴",
-close: "닫기",
-back: "뒤로",
-home: "홈"
-},
-footer: {
-policies: "리용약관과 개인정보정책",
-language: "언어",
-github: "봉사자용 원시 프로그람",
-notice: "신뢰받는 봉사를 지향하지만 고등학생이기에 미흡한 점이 있을수 있습니다.\n그러한 경우 문의양식을 통해 지적해주시면 고맙겠습니다."
-},
-menus: {
-saetab: {
-title: "앞길",
-items: [
-"앞길7에 대하여",
-"설정방법",
-"지금 써보기"
-]
-},
-products: {
-title: "제품",
-items: [
-"제품목록",
-"도구",
-"바람조작체계",
-"나의 길 동무 페지 (Google)",
-"등록상표",
-"니델레 계렬"
-]
-},
-support: {
-title: "지원과 정보",
-items: [
-"지원",
-"내 GitHub",
-"문의",
-"리용약관 및 개인정보정책",
-"언어"
-]
-}
-}
-},
+  "kp": {
+    header: {
+      products: "제품",
+      firstGoal: "Nidele",
+      support: "지원과 정보",
+      menu: "메뉴",
+      close: "닫기",
+      back: "뒤로",
+      home: "홈"
+    },
+    footer: {
+      policies: "리용약관과 개인정보처리정책",
+      language: "언어",
+      github: "봉사자용 원시 프로그람",
+      notice: "신뢰받는 봉사를 지향하지만 고등학생이기에 미흡한 점이 있을수 있습니다.\n그러한 경우 문의양식을 통해 지적해주시면 고맙겠습니다."
+    },
+    menus: {
+      products: {
+        title: "제품",
+        items: [
+          "앞길에 대하여",
+          "제품목록",
+          "첫 번째 목표"
+        ]
+      },
+      support: {
+        title: "지원과 정보",
+        items: [
+          "지원",
+          "내 GitHub",
+          "문의",
+          "리용약관과 개인정보처리정책"
+      ]
+      }
+    }
+  },
 
-zh: {
-header: {
-products: "产品",
-saetab: "SaeTab 7",
-firstGoal: "第一目标",
-support: "支持与信息",
-menu: "菜单",
-close: "关闭",
-back: "返回",
-home: "主页"
-},
-footer: {
-policies: "使用条款和隐私政策",
-language: "语言",
-github: "GitHub",
-notice: "我们致力于成为值得信赖的服务，但由于我还是一名高中生，可能会有做得不够周全的地方。\n如有不周之处，敬请通过联系表单指出，非常感谢。"
-},
-menus: {
-saetab: {
-title: "SaeTab 7",
-items: [
-"了解 SaeTab 7",
-"设置方法",
-"立即试用"
-]
-},
-products: {
-title: "产品",
-items: [
-"产品列表",
-"工具",
-"BaramOS",
-"我的 Google Play",
-"标志",
-"你的乐系列"
-]
-},
-support: {
-title: "支持与信息",
-items: [
-"支持",
-"我的 GitHub",
-"联系我",
-"使用条款和隐私政策",
-"语言"
-]
-}
-}
-},
+  hi: {
+    header: {
+      products: "Sentaro श्रृंखला",
+      firstGoal: "Nidele",
+      support: "समर्थन और जानकारी",
+      menu: "मेन्यू",
+      close: "बंद करें",
+      back: "वापस",
+      home: "होम"
+    },
+    footer: {
+      policies: "नियम और गोपनीयता नीति",
+      language: "भाषा",
+      github: "GitHub",
+      notice: "हम एक ऐसी सेवा प्रदान करने के लिए प्रयास कर रहे हैं जिस पर भरोसा किया जा सकता है, लेकिन एक हाई स्कूल के छात्र के रूप में, मैं गलती या दायरे से बाहर की बातें कर सकता हूँ।\nयदि कोई समस्या देखते हैं, तो कृपया संपर्क फॉर्म के माध्यम से बताएं, तो मैं बहुत आभारी हूँ।"
+    },
+    menus: {
+      products: {
+        title: "उत्पाद",
+        items: [
+          "Sentaro के बारे में",
+          "उत्पाद सूची",
+          "पहला लक्ष्य"
+        ]
+      },
+      support: {
+        title: "समर्थन और जानकारी",
+        items: [
+          "समर्थन",
+          "मेरा GitHub",
+          "संपर्क करें",
+          "नियम और गोपनीयता नीति"
+      ]
+      }
+    }
+  },
 
-"zh-tw": {
-header: {
-products: "產品",
-saetab: "SaeTab 7",
-firstGoal: "第一目標",
-support: "支援與資訊",
-menu: "選單",
-close: "關閉",
-back: "返回",
-home: "首頁"
-},
-footer: {
-policies: "使用條款與隱私權政策",
-language: "語言",
-github: "GitHub",
-notice: "我們致力於成為值得信賴的服務，但由於我還是一名高中生，可能會有做得不夠周全的地方。\n如有不周之處，敬請透過聯絡表單指正，十分感謝。"
-},
-menus: {
-saetab: {
-title: "SaeTab 7",
-items: [
-"了解 SaeTab 7",
-"設定方法",
-"立即試用"
-]
-},
-products: {
-title: "產品",
-items: [
-"產品列表",
-"工具",
-"BaramOS",
-"我的 Google Play",
-"標誌",
-"你的楽系列"
-]
-},
-support: {
-title: "支援與資訊",
-items: [
-"支援",
-"聯絡我",
-"聯絡我",
-"使用條款與隱私權政策",
-"語言"
-]
-}
-}
-},
+  zh: {
+    header: {
+      products: "Sentaro系列",
+      firstGoal: "Nidele",
+      support: "支持与信息",
+      menu: "菜单",
+      close: "关闭",
+      back: "返回",
+      home: "主页"
+    },
+    footer: {
+      policies: "使用条款与个人信息处理政策",
+      language: "语言",
+      github: "GitHub",
+      notice: "我们致力于成为值得信赖的服务，但由于我还是一名高中生，可能会有做得不够周全的地方。\n如有不周之处，敬请通过联系表单指出，非常感谢。"
+    },
+    menus: {
+      products: {
+        title: "产品",
+        items: [
+          "Sentaro简介",
+          "产品列表",
+          "第一目标"
+        ]
+      },
+      support: {
+        title: "支持与信息",
+        items: [
+          "支持",
+          "我的 GitHub",
+          "联系我",
+          "使用条款与个人信息处理政策"
+      ]
+      }
+    }
+  },
 
-ru: {
-header: {
-products: "Продукты",
-saetab: "SaeTab 7",
-firstGoal: "Первая цель",
-support: "Поддержка и информация",
-menu: "Меню",
-close: "Закрыть",
-back: "Назад",
-home: "Главная"
-},
-footer: {
-policies: "Условия использования и политика конфиденциальности",
-language: "Язык",
-github: "GitHub",
-notice: "Мы стремимся предоставлять сервис, которому можно доверять, но, поскольку я ещё учусь в старшей школе, я могу допустить недочёты.\nЕсли вы заметите что-либо подобное, буду благодарен, если сообщите об этом через форму обратной связи."
-},
-menus: {
-saetab: {
-title: "SaeTab 7",
-items: [
-"О SaeTab 7",
-"Как настроить",
-"Попробовать сейчас"
-]
-},
-products: {
-title: "Продукты",
-items: [
-"Все продукты",
-"Инструменты",
-"BaramOS",
-"Мой Google Play",
-"Логотипы",
-"Серия Nidele"
-]
-},
-support: {
-title: "Поддержка и информация",
-items: [
-"Поддержка",
-"Мой GitHub",
-"Связаться",
-"Условия и политика конфиденциальности",
-"Язык"
-]
-}
-}
-}
+  "zh-tw": {
+    header: {
+      products: "Sentaro系列",
+      firstGoal: "Nidele",
+      support: "支援與資訊",
+      menu: "選單",
+      close: "關閉",
+      back: "返回",
+      home: "首頁"
+    },
+    footer: {
+      policies: "使用條款與個人資訊處理政策",
+      language: "語言",
+      github: "GitHub",
+      notice: "我們致力於成為值得信賴的服務，但由於我還是一名高中生，可能會有做得不夠周全的地方。\n如有不周之處，敬請透過聯絡表單指正，十分感謝。"
+    },
+    menus: {
+      products: {
+        title: "產品",
+        items: [
+          "關於Sentaro",
+          "產品列表",
+          "第一目標"
+        ]
+      },
+      support: {
+        title: "支援與資訊",
+        items: [
+          "支援",
+          "聯絡我",
+          "聯絡我",
+          "使用條款與個人資訊處理政策"
+      ]
+      }
+    }
+  },
+
+  ru: {
+    header: {
+      products: "Серия Sentaro",
+      firstGoal: "Nidele",
+      support: "Поддержка и информация",
+      menu: "Меню",
+      close: "Закрыть",
+      back: "Назад",
+      home: "Главная"
+    },
+    footer: {
+      policies: "Условия использования и политика обработки персональных данных",
+      language: "Язык",
+      github: "GitHub",
+      notice: "Мы стремимся предоставлять сервис, которому можно доверять, но, поскольку я ещё учусь в старшей школе, я могу допустить недочёты.\nЕсли вы заметите что-либо подобное, буду благодарен, если сообщите об этом через форму обратной связи."
+    },
+    menus: {
+      products: {
+        title: "Продукты",
+        items: [
+          "О Sentaro",
+          "Продукты",
+          "Первая цель"
+        ]
+      },
+      support: {
+        title: "Поддержка и информация",
+        items: [
+          "Поддержка",
+          "Мой GitHub",
+          "Связаться",
+          "Условия и политика обработки персональных данных"
+      ]
+      }
+    }
+  }
 };
 
 function getSelectedLang() {
-let rawLang = "ja";
+  const path = window.location.pathname;
+  const langCodes = ["zh-tw", "zh", "kp", "kr", "ru", "en", "hi"];
 
-try {
-rawLang =
-window.localStorage.getItem("selectedLang") || "ja";
-} catch (error) {
-console.error(
-`[${NS}] failed to read selectedLang from localStorage.`,
-error
-);
-return "ja";
-}
+  for (const code of langCodes) {
+    if (path.includes(`/i/${code}/`) || path.includes(`/${code}/`)) {
+      return code;
+    }
+  }
 
-if (typeof rawLang !== "string") {
-console.error(
-`[${NS}] selectedLang is not a string.`,
-rawLang
-);
-return "ja";
-}
-
-const normalizedLang =
-rawLang
-.trim()
-.toLowerCase()
-.replace(/_/g, "-");
-
-if (I18N[normalizedLang]) {
-return normalizedLang;
-}
-
-if (normalizedLang.startsWith("ko-kp")) {
-return "ko-kp";
-}
-
-if (normalizedLang.startsWith("ko")) {
-return "ko";
-}
-
-if (
-normalizedLang.startsWith("zh-tw") ||
-normalizedLang.startsWith("zh-hant")
-) {
-return "zh-tw";
-}
-
-if (normalizedLang.startsWith("zh")) {
-return "zh";
-}
-
-if (normalizedLang.startsWith("en")) {
-return "en";
-}
-
-if (normalizedLang.startsWith("ru")) {
-return "ru";
-}
-
-console.info(
-`[${NS}] unsupported selectedLang, falling back to ja: ${rawLang}`
-);
-
-return "ja";
+  return "ja";
 }
 
 function getI18n() {
@@ -468,22 +361,15 @@ href="https://search3958.github.io/"
 </span>
 </a>
 
+<a href="https://nidele206.github.io/">
+    <span data-headerv2-i18n="header.firstGoal">Nidele</span>
+</a>
+
 <a
-href="https://search3958.github.io/i/products/"
+href="https://search3958.github.io/"
 data-headerv2-menu="products"
 >
-<span data-headerv2-i18n="header.products">プロダクト</span>
-</a>
-
-<a
-href="https://search3958.github.io/i/saetab/"
-data-headerv2-menu="saetab"
->
-<span data-headerv2-i18n="header.saetab">SaeTab 7</span>
-</a>
-
-<a href="https://search3958.github.io/i/red/">
-<span data-headerv2-i18n="header.firstGoal">第一目標</span>
+<span data-headerv2-i18n="header.products">Sentaro系列</span>
 </a>
 
 <a
@@ -509,7 +395,7 @@ aria-label="メニュー"
 const footerHTML = `
 
 <footer>
-<span><a href="https://search3958.github.io/policies/"><span data-headerv2-i18n="footer.policies">利用規約と個人情報政策</span></a>・<a href="https://github.com/search3958/"><span data-headerv2-i18n="footer.github">GitHub</span></a></span>
+<span><a href="https://nidele206.github.io/policies/"><span data-headerv2-i18n="footer.policies">利用規約と個人情報処理政策</span></a>・<a href="https://github.com/search3958/"><span data-headerv2-i18n="footer.github">GitHub</span></a></span>
 <br>
 
 <img width="40" height="60" src="https://nidele206.github.io/nidele-logo-1.svg">
@@ -526,50 +412,21 @@ data-headerv2-i18n="footer.notice"
 `;
 
 const menuData = {
-saetab: {
-titleKey: "saetab",
-items: [
-{
-href:
-"https://search3958.github.io/i/saetab/"
-},
-{
-href:
-"https://search3958.github.io/support/docs/ja/newtab_setup.html"
-},
-{
-href:
-"https://search3958.github.io/newtab/?value=head-try"
-}
-]
-},
 
 products: {
 titleKey: "products",
 items: [
 {
 href:
+"https://search3958.github.io/"
+},
+{
+href:
 "https://search3958.github.io/i/products/"
 },
 {
 href:
-"https://search3958.github.io/i/tools/"
-},
-{
-href:
-"https://search3958.github.io/i/baram-os/"
-},
-{
-href:
-"https://play.google.com/store/apps/dev?id=5714216887541621486"
-},
-{
-href:
-"https://search3958.github.io/project/logos"
-},
-{
-href:
-"https://nidele206.github.io/"
+"https://search3958.github.io/i/red/"
 }
 ]
 },
@@ -591,11 +448,7 @@ href:
 },
 {
 href:
-"https://search3958.github.io/policies/"
-},
-{
-href:
-"https://search3958.github.io/accounts/lang"
+"https://nidele206.github.io/policies/"
 }
 ]
 }
@@ -1602,7 +1455,7 @@ headerItems.filter(
  element !== logoLink
 );
 
-if (desktopNavItems.length !== 4) {
+if (desktopNavItems.length !== 3) {
 console.error(
 `[${NS}] expected exactly 4 desktop navigation items, found ${desktopNavItems.length}.`
 );
