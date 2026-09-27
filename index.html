@@ -55,7 +55,406 @@
     <link rel="alternate" hreflang="ko" href="https://nidele206.github.io/">
     <link rel="alternate" hreflang="x-default" href="https://nidele206.github.io/">
 
-    <link rel="stylesheet" href="https://nidele206.github.io/index/main.css">
+    <!--link rel="stylesheet" href="https://nidele206.github.io/index/main.css" -->
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wdth,wght,ROND@6..144,25..151,1..1000,0..100&display=swap');
+
+* {
+    box-sizing: border-box;
+    font-family: "Google Sans Flex", "Noto Sans KR", sans-serif;
+    line-height: 1.5 !important
+}
+
+html {
+    scroll-behavior: smooth
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    color: #000;
+    background: #fff
+}
+
+a {
+    text-decoration: none;
+    color: #000
+}
+
+header {
+    position: fixed;
+    background: #fffb;
+    color: #000;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 12px 0;
+    gap: 24px;
+    font-size: 13px
+}
+
+.creative-intro {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    min-height: 500px;
+    padding: 112px 48px 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #000000;
+    background: #eee;
+    text-align: center;
+    flex-direction: column;
+}
+
+.floating-icons {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.float-icon {
+    position: absolute;
+    width: 40vw;
+    max-width: 30vh;
+    height: auto;
+    opacity: 0;
+    background:#fff6;
+    border-radius:999px;
+    z-index:-1;
+}
+
+@keyframes icon-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.5);
+    }
+    60% {
+        opacity: 0.55;
+        transform: translateY(-4px) scale(1.05);
+    }
+    100% {
+        opacity: 0.55;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-16px);
+    }
+}
+
+.float-icon-1 {
+    top: -10%;
+    left: 5%;
+    animation: icon-enter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.3s forwards,
+               float 6s ease-in-out 1.5s infinite;
+}
+
+.float-icon-2 {
+    top: 20%;
+    right: 10%;
+    animation: icon-enter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.6s forwards,
+               float 6s ease-in-out 1.8s infinite;
+}
+
+.float-icon-3 {
+    bottom: -10%;
+    left: 10%;
+    animation: icon-enter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.9s forwards,
+               float 6s ease-in-out 2.1s infinite;
+}
+
+.float-icon-4 {
+    bottom: 20%;
+    right: 12%;
+    animation: icon-enter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1.2s forwards,
+               float 6s ease-in-out 2.4s infinite;
+}
+@keyframes icon-enter {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.5);
+    }
+    to {
+        opacity: 0.55;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-16px);
+    }
+}
+
+.creative-intro > p,
+.creative-intro > h1 {
+    margin: 0;
+    text-align: center;
+}
+
+.creative-message {
+    display: block;
+    width: max-content;
+    margin: 0 auto;
+    font-size: clamp(16px, 2.6vw, 32px);
+    font-weight: 700;
+    color: #000;
+    text-align: center;
+}
+
+.creative-message b.accent {
+    font-weight: bold;
+    color: #000
+}
+
+.creative-title {
+    display: block;
+    width: clamp(360px, 46vw, 631px);
+    margin: 28px auto 0;
+    font-size: clamp(28px, 5vw, 64px);
+    opacity: 1;
+    transform: scale(1);
+    text-align: center;
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .creative-intro::before {
+        animation: none !important;
+        transform: translateY(-50%) scale(1) !important
+    }
+}
+
+.first {
+    background: #69ffb4;
+    background-image: conic-gradient(from 45deg, #000000 0deg, #00FF8200 45deg), conic-gradient(from -45deg, #a8ffeb 0deg, #C3FF0000 45deg), conic-gradient(from 135deg, #e7fff9 0deg, #00FF4400 45deg), conic-gradient(from -135deg, #f8ffa7 0deg, #00FF4400 45deg);
+    padding: 48px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 40px;
+    position: relative;
+    height: 144px;
+    overflow: hidden;
+    padding-top: 80px
+}
+
+.first:before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: conic-gradient(from 180deg, #00C464 0deg, #00FF8200 45deg), conic-gradient(from 0deg, #9AFF8C 0deg, #C3FF0000 45deg), conic-gradient(from 90deg, #ACEAFF 0deg, #00FF4400 45deg), conic-gradient(from -90deg, #51FCFF 0deg, #00FF4400 45deg);
+    mix-blend-mode: overlay
+}
+
+.small {
+    font-size: 16px;
+    opacity: 0.7;
+    transition: 1.5s all cubic-bezier(1, 0, .18, 1);
+    padding-top: 0;
+    font-weight: 400;
+    font-variation-settings: "slnt"0, "wdth"100, "GRAD"0, "ROND"0
+}
+
+.small.before {
+    font-size: 48px;
+    opacity: 1;
+    padding-top: 48px;
+    font-weight: bold;
+    font-variation-settings: "slnt"0, "wdth"160, "GRAD"0, "ROND"40
+}
+
+.message {
+    transition: 2s all cubic-bezier(.06, .37, 0, 1), 1s filter cubic-bezier(.19, .08, 0, 1);
+    opacity: 1;
+    filter: blur(0px);
+    display: block;
+    transform: translateY(0px);
+    transition-delay: 0.7s
+}
+
+.message.before {
+    opacity: 0;
+    filter: blur(16px);
+    transform: translateY(120px)
+}
+
+.xincard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 24px;
+    gap: 4px;
+    flex-direction: column;
+    font-weight: bold;
+    text-align: center;
+    font-size: 32px;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(207, 217, 232, 1))
+}
+
+.app-icon {
+    height: 52px;
+    width: 52px;
+    border-radius: 100px;
+    background: #fff
+}
+
+.app-image {
+    width: 70vw
+}
+
+.app-name {
+    display: inline-block
+}
+
+.goodcard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 24px;
+    text-align: center;
+    gap: 4px;
+    font-size: 32px;
+    flex-direction: column;
+    background-image: radial-gradient(circle at 50% 190%, rgba(0, 13, 25, 1), rgb(0 122 82) 66%, rgb(0 128 82) 73%, rgb(0 117 79) 80%, rgba(0, 13, 25, 1));
+    color: #fff;
+    padding-bottom: 24px
+}
+
+.goodxiao {
+    padding: 24px 32px;
+    border-radius: 100px;
+    background-color: color(display-p3 0.4 1 0.573 / 1);
+    font-weight: bold;
+    color: #000
+}
+
+.goodxiao.white {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 24px
+}
+
+.primary-btn {
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-weight: bold;
+    border: none
+}
+
+.product-section {
+    padding: 64px 20px;
+    text-align: left
+}
+
+.product-title {
+    max-width: 1040px;
+    margin: 0 auto;
+    font-size: 40px;
+    font-weight: 700;
+    font-variation-settings: "slnt"0, "wdth"120, "GRAD"0, "ROND"24
+}
+
+h3.product-title {
+    font-size: 24px;
+    margin-top: 16px
+}
+
+.product-grid {
+    max-width: 1040px;
+    margin: 8px auto 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px
+}
+
+.product-link {
+    background: #eff0f1;
+    border-radius: 100px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: transform .25s ease, box-shadow .25s ease;
+    flex-shrink: 0;
+}
+
+.product-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px #00000005
+}
+
+h1{
+  font-weight:400;
+}
+
+.product-link img {
+    width: 56px;
+    height: 56px;
+    border-radius: 100px;
+    object-fit: cover;
+    background: #fff
+}
+
+.product-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: #12201d;
+    line-height: 1.3
+}
+
+footer {
+    padding: 48px 0;
+    text-align: center;
+    font-size: 20px
+}
+
+@media (max-width:720px) {
+
+    .creative-message {
+        font-size: clamp(16px, 4.2vw, 20px);
+        text-align: center;
+    }
+
+    .creative-title {
+        margin-top: 24px;
+        transform: none;
+    }
+
+}
+
+@media (max-width:430px) {
+    .creative-intro {
+        min-height: 580px;
+        padding: 92px 16px 28px
+    }
+}
+
+@media (max-width:360px) {
+    .creative-intro {
+        padding: 88px 12px 24px
+    }
+}
+    </style>
   </head>
 
   <body>
@@ -82,41 +481,18 @@
            Creative Intro
            ===================================================== -->
 
-      <section
+<section
         class="creative-intro"
         aria-label="Nidele introduction"
       >
-
-        <div class="creative-intro-inner">
-
-          <div class="creative-copy">
-
-            <p
-              class="creative-message"
-              id="creative-message"
-              aria-label="終わりなく創造性が続くことを願います"
-            ></p>
-
-            <img
-              class="creative-title"
-              id="creative-title"
-              src="https://nidele206.github.io/imgs/welcome-ja.png"
-            >
-
-          </div>
-
-          <div class="creative-visual">
-
-            <img
-              class="creative-illustration"
-              src="https://nidele206.github.io/imgs/welcome-creative.svg"
-              alt=""
-            >
-
-          </div>
-
+            <p class="creative-message">終わりなく<b class="accent">創造性が続くこと</b>を願います</p>
+        <h1 class="creative-title">Nideleで<b class="accent">千万里</b></h1>
+        <div class="floating-icons">
+          <img src="https://nidele206.github.io/imgs/oneul-launcher.png" alt="" class="float-icon float-icon-1">
+          <img src="https://nidele206.github.io/imgs/wo-checker.png" alt="" class="float-icon float-icon-2">
+          <img src="https://nidele206.github.io/imgs/easy-flowchart.png" alt="" class="float-icon float-icon-3">
+          <img src="https://nidele206.github.io/imgs/files-taco.svg" alt="" class="float-icon float-icon-4">
         </div>
-
       </section>
 
       <!-- =====================================================
