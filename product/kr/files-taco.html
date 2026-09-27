@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Files Taco - Google Drive에서 파일, Docs, Sheets, Slides, Forms, 메모, 웹 링크를 프로젝트 단위로 관리하고 공유합니다.">
+  <meta name="color-scheme" content="light dark">
+  <title>Files Taco</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://esm.run" crossorigin>
+  <link rel="stylesheet" href="../src/files-taco/style.css">
+</head>
+<body>
+  <div class="ft-app-shell">
+<div class="ft-content-shell">
+      <header class="ft-topbar">
+        <a class="ft-brand" href="./" aria-label="Files Taco 홈">
+          <img class="ft-brand-icon" src="../src/files-taco/icon.svg" alt="" width="36" height="36">
+          <span class="ft-brand-name">Files Taco</span>
+        </a>
+        <div class="ft-topbar-actions">
+          <span id="ft-auth-status" class="ft-account-label" aria-live="polite"></span>
+          <md-outlined-button id="ft-drive-connect-button" class="is-hidden">Drive 연결</md-outlined-button>
+          <md-text-button id="ft-logout-button" class="is-hidden">연결 해제</md-text-button>
+        </div>
+      </header>
+
+    <div id="ft-busy-overlay" class="ft-busy-overlay" aria-hidden="true">
+      <div class="ft-busy-card" role="status" aria-live="polite" aria-label="처리 중">
+        <div id="ft-busy-label" class="ft-busy-label">처리 중…</div>
+        <md-linear-progress indeterminate aria-label="처리 중"></md-linear-progress>
+      </div>
+    </div>
+
+    <main class="ft-main">
+      <section id="ft-home-view" class="ft-view" aria-labelledby="ft-home-title">
+        <div class="ft-home-layout">
+          <div class="ft-home-copy">
+            <h1 id="ft-home-title">파일을 하나의 프로젝트에.</h1>
+            <p class="ft-home-lead">Google Drive의 실제 파일을 중심으로 Docs, Sheets, Slides, Forms, 메모, 웹 링크를 하나의 프로젝트로 정리합니다.</p>
+            <div class="ft-home-actions">
+              <md-filled-button id="ft-home-login-button">Google Drive에 연결</md-filled-button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ft-dashboard-view" class="ft-view is-hidden" aria-labelledby="ft-dashboard-title">
+        <div class="ft-page-header">
+          <div>
+            <h1 id="ft-dashboard-title">프로젝트</h1>
+          </div>
+        </div>
+
+        <div class="ft-dashboard-toolbar">
+          <md-filled-button id="ft-create-project-button" has-icon>
+            <md-icon slot="icon">add</md-icon>
+            새 프로젝트
+          </md-filled-button>
+        </div>
+
+        <div id="ft-project-list" class="ft-project-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="ft-project-manager-view" class="ft-view is-hidden" aria-labelledby="ft-manager-title">
+        <div id="ft-manager-content"></div>
+      </section>
+
+      <section id="ft-public-view" class="ft-view is-hidden" aria-labelledby="ft-public-title">
+        <div id="ft-public-project"></div>
+      </section>
+    </main>
+
+    <div id="ft-snackbar" class="ft-snackbar" role="status" aria-live="polite" aria-atomic="true">
+      <span class="ft-snackbar-icon material-symbols-rounded" data-snackbar-icon aria-hidden="true">check_circle</span>
+      <span id="ft-snackbar-message" class="ft-snackbar-message"></span>
+    </div>
+
+    <md-dialog id="ft-name-dialog">
+      <div slot="headline" id="ft-name-dialog-title">이름 변경</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-name-dialog-input" label="이름" required></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-name-dialog-cancel">취소</md-text-button>
+        <md-filled-button id="ft-name-dialog-confirm">변경</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-delete-dialog" type="alert">
+      <div slot="headline">삭제하시겠습니까?</div>
+      <div slot="content" id="ft-delete-dialog-content" class="ft-dialog-text"></div>
+      <div slot="actions">
+        <md-text-button id="ft-delete-dialog-cancel">취소</md-text-button>
+        <md-filled-button id="ft-delete-dialog-confirm">삭제</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-project-create-dialog">
+      <div slot="headline">새 프로젝트</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-project-create-name" label="프로젝트 이름" required></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-project-create-cancel">취소</md-text-button>
+        <md-filled-button id="ft-project-create-confirm">만들기</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-create-dialog">
+      <div slot="headline" id="ft-create-dialog-title">추가</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-create-dialog-name" label="이름" required></md-outlined-text-field>
+        <md-outlined-text-field id="ft-create-dialog-url" label="URL" type="url" class="is-hidden"></md-outlined-text-field>
+        <md-outlined-text-field id="ft-create-dialog-content-input" label="메모" type="textarea" rows="6" class="is-hidden"></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-create-dialog-cancel">취소</md-text-button>
+        <md-filled-button id="ft-create-dialog-confirm">추가</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-share-dialog">
+      <div slot="headline" class="ft-dialog-headline-with-close">
+        <span>프로젝트 공유</span>
+        <md-icon-button id="ft-share-close-button" aria-label="닫기"><md-icon>close</md-icon></md-icon-button>
+      </div>
+      <div slot="content" class="ft-share-content">
+        <div class="ft-share-entry">
+          <md-outlined-text-field id="ft-share-email" label="Google 계정" type="email" placeholder="example@gmail.com"></md-outlined-text-field>
+          <md-filled-button id="ft-share-add-button">공유</md-filled-button>
+        </div>
+        <div id="ft-share-list" class="ft-share-list"></div>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-share-link-dialog">
+      <div slot="headline" class="ft-dialog-headline-with-close">
+        <span>공유 링크</span>
+        <md-icon-button id="ft-share-link-close-button" aria-label="닫기">
+          <md-icon>close</md-icon>
+        </md-icon-button>
+      </div>
+      <div slot="content" class="ft-dialog-content ft-share-link-content">
+        <md-outlined-text-field id="ft-share-link-input" label="공유 링크" type="url" readonly></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-share-link-copy-button">복사</md-text-button>
+      </div>
+    </md-dialog>
+    </div>
+  </div>
+
+  <script>window.STRINGS={busyDefault:'처리 중…',driveConnected:'Google Drive 연결됨',logout:'연결 해제',connectDrive:'Google Drive에 연결됨',driveConnectFailed:'Drive에 연결할 수 없습니다: {error}',disconnectDrive:'Google Drive 연결 해제',allowDriveAccess:'Google Drive 접근을 허용하세요.',driveConnectionRequired:'Google Drive 연결이 필요합니다',driveAuthRequired:'Drive 인증 필요 상태를 UI에 반영했습니다',noAutoOAuth:'시작/자동 처리에서 Google Drive OAuth 팝업을 열지 않습니다',noProjects:'프로젝트가 없습니다.',projectListEmpty:'프로젝트 목록: 0개',projectListCount:'프로젝트 목록: {count}개',projectListFetched:'프로젝트 목록 가져옴: {count}개',projectFetchFailed:'프로젝트를 가져올 수 없습니다: {error}',projectCreateSuccess:'프로젝트를 만들었습니다',projectCreateFailed:'만들 수 없습니다: {error}',projectCreating:'프로젝트를 만드는 중…',projectNameRequired:'프로젝트 이름을 입력하세요',projectNameFallback:'이름 없음',noItems:'항목이 없습니다.',itemCount:'항목: {count}',itemKindMemo:'메모',itemKindWeb:'웹 링크',itemNameFallback:'이름 없음',memoLoading:'메모를 로드하는 중…',memoPlaceholder:'메모 내용',memoPlaceholderShort:'메모',nameDialogTitleProject:'프로젝트 이름 변경',nameDialogTitleItem:'이름 변경',nameInputRequired:'이름을 입력하세요',createDialogTitleDocument:'Google Docs 만들기',createDialogTitleSpreadsheet:'Google Sheets 만들기',createDialogTitlePresentation:'Google Slides 만들기',createDialogTitleForm:'Google Forms 만들기',createDialogTitleMemo:'메모 추가',createDialogTitleWeb:'웹 링크 추가',createDialogConfirmAdd:'추가',createDialogConfirmCreate:'만들기',shareTitle:'프로젝트 공유',shareLinkTitle:'공유 링크',shareEmailLabel:'Google 계정',shareAddButton:'공유',shareCopyButton:'복사',shareCloseButton:'닫기',managerBack:'프로젝트 목록으로',managerView:'보기 모드',managerShareLink:'공유 링크',managerRename:'이름 변경',managerShare:'공유',addFile:'파일',addMemo:'메모',addWeb:'웹',openLink:'열기',viewButton:'보기',editButton:'편집',downloadButton:'다운로드',renameButton:'이름 변경',deleteButton:'삭제',openButtonAria:'열기',downloadAria:'다운로드',renameAria:'이름 변경',deleteAria:'삭제',downloadInvalidTarget:'잘못된 다운로드 대상',downloadNotFound:'다운로드 대상을 확인할 수 없습니다',downloadNotFile:'다운로드 대상이 일반 파일이 아닙니다',downloadNotAvailable:'이 항목은 다운로드할 수 없습니다',downloadStart:'파일 다운로드 시작',downloadComplete:'파일 다운로드 완료',downloadUrlReleaseFailed:'다운로드 URL 해제 실패',downloadStarted:'다운로드 시작',downloadFailed:'다운로드 실패: {error}',uploadContainerNotFound:'업로드 컨테이너가 없습니다',fileAdded:'파일이 추가되었습니다',fileAddFailed:'파일을 추가할 수 없습니다: {error}',fileAddSuccess:'파일 추가 성공',fileAddError:'파일 추가 실패',itemOpenNoLink:'열기 링크가 없습니다',deleteConfirm:'"{label}"을 삭제합니다. Google Drive에서도 휴지통으로 이동합니다.',deleteItem:'삭제됨',deleteSuccess:'항목 삭제 성공',deleteFailed:'항목 삭제 실패',deleteError:'삭제할 수 없습니다: {error}',renameSuccess:'이름이 변경되었습니다',renameItemSuccess:'이름이 변경되었습니다',renameSuccessLog:'이름 변경 성공',renameFailedLog:'이름 변경 실패',renameError:'이름을 변경할 수 없습니다: {error}',managerSubCount:'개',snackbarDomNotFound:'Snackbar DOM이 없습니다',snackbarIconNotFound:'Snackbar 아이콘이 없습니다',projectCardButtonsFailed:'프로젝트 작업 버튼 생성 실패',thumbnailTargetNotFound:'썸네일 대상 이미지가 없습니다',thumbnailPreviewNotFound:'썸네일 미리보기 영역이 없습니다',thumbnailPlaceholderNotFound:'썸네일 플레이스홀더가 없습니다',downloadTargetInvalid:'잘못된 다운로드 대상',downloadTargetNotFound:'다운로드 대상을 확인할 수 없습니다',downloadNotFile:'다운로드 대상이 일반 파일이 아닙니다',downloadNotAvailable:'이 항목은 다운로드 대상이 아닙니다',downloadStart:'파일 다운로드 시작',downloadComplete:'파일 다운로드 완료',downloadUrlReleaseFailed:'다운로드 URL 해제 실패',downloadStarted:'다운로드 시작',downloadFailed:'다운로드 실패: {error}',uploadContainerNotFound:'업로드 컨테이너가 없습니다',fileAdded:'파일이 추가되었습니다',fileAddFailed:'파일을 추가할 수 없습니다: {error}',fileAddSuccess:'파일 추가 성공',fileAddError:'파일 추가 실패',itemOpenNoLink:'열기 링크가 없습니다',itemDeleteConfirm:'"{label}"을 삭제합니다. Google Drive에서도 휴지통으로 이동합니다.',memoIdNotFound:'메모 ID가 없습니다',memoFetchFailed:'메모 본문 가져오기 실패',memoFetchError:'메모를 로드할 수 없습니다: {error}',memoFetchComplete:'메모 본문 가져옴: {count}개',managerFetchSuccess:'관리자 화면 가져오기 성공',managerCacheFallback:'서버 가져오기 실패로 방금 생성된 데이터를 표시합니다',managerCacheFallbackMsg:'최신 정보를 가져올 수 없어 표시를 일시적으로 유지합니다',managerOpenFailed:'프로젝트를 열 수 없습니다: {error}',notProjectOwner:'이 프로젝트의 작성자가 아닙니다',urlProtocolRequired:'http:// 또는 https:// URL을 입력하세요',domInitFailed:'DOM 초기화 실패',domInitComplete:'DOM 초기화 완료',missingDom:'필수 DOM이 없습니다: {key}',viewNotFound:'뷰가 없습니다: {key}',viewChanged:'표시 뷰: {name}',overlayNotFound:'처리 오버레이가 없습니다',progressFadeComplete:'Progress 페이드아웃 완료',progressShown:'Progress 표시: {message}',driveSessionSaved:'Drive 세션 저장됨',driveSessionCleared:'Drive 세션 해제됨',driveSessionRestored:'저장된 Drive 세션 복원됨',driveGrantSaved:'Google Drive 인증 상태 저장됨',driveGrantSaveFailed:'Drive 인증 상태 저장 실패',driveGisLoaded:'Google Identity Services 로드 완료',driveGisApiUnavailable:'Google Identity Services API를 사용할 수 없습니다',driveGisLoadFailed:'Google Identity Services 로드 실패',driveTokenClientInit:'Google Drive Token Client 초기화 완료',driveTokenMissing:'Google Drive 액세스 토큰을 가져올 수 없습니다',driveTokenError:'Google Drive 액세스 토큰 가져오기 실패',driveTokenSuccess:'Google Drive 액세스 토큰 가져오기 성공',driveUserTokenMissing:'Drive 사용자 정보 가져오기 시 액세스 토큰이 없습니다',driveUserSuccess:'Google Drive 사용자 정보 가져오기 성공',driveUserFailed:'Google Drive 사용자 정보 가져오기 실패',driveSessionValidated:'저장된 Drive 세션 검증됨',driveRedirectToProjects:'저장된 Drive 연결 확인 후 프로젝트 목록으로 이동',driveAutoRedirect:'Drive 연결/인증 완료 후 프로젝트 목록으로 자동 이동',driveFetchFailed:'Drive 연결 후 프로젝트 목록 가져오기 실패',driveConnectStart:'Google Drive 연결 시작: interactive={interactive}, force={force}',driveTokenRequest:'Drive 액세스 토큰 요청: interactive={interactive}, prompt={prompt}',driveTokenRequestFailed:'Drive 액세스 토큰 요청 시작 실패',driveConnectUserStart:'사용자 작업으로 Drive 연결 시작',driveConnectUserSuccess:'사용자 작업으로 Drive 연결 완료',driveConnectUserFailed:'사용자 작업으로 Drive 연결 실패',apiJsonParseFailed:'JSON 응답 파싱 실패',api401NoAutoOAuth:'Worker가 401을 반환하여 자동 OAuth를 수행하지 않고 Drive 연결 버튼을 표시합니다',api401AuthRequired:'Drive 인증 필요 상태를 UI에 반영했습니다',projectListEmpty:'프로젝트 목록: 0개',projectListCount:'프로젝트 목록: {count}개',projectListFetched:'프로젝트 목록 가져옴: {count}개',projectFetchFailed:'프로젝트 목록 가져오기 실패',projectCreateSuccess:'프로젝트 생성 성공',projectCreateFailed:'프로젝트 생성 실패',itemCount:'항목: {count}',memoIdNotFound:'메모 ID가 없습니다',memoFetchFailed:'메모 본문 가져오기 실패',memoFetchComplete:'메모 본문 가져옴: {count}개',managerFetchSuccess:'관리자 화면 가져오기 성공',managerCacheFallback:'서버 가져오기 실패로 방금 생성된 데이터를 표시합니다',downloadComplete:'파일 다운로드 완료',downloadUrlReleaseFailed:'다운로드 URL 해제 실패',fileAddSuccess:'파일 추가 성공',fileAddFailed:'파일 추가 실패',downloadStart:'파일 다운로드 시작',snackbarMessage:'Snackbar: {message}',snackbarError:'Snackbar: {message}',headerUpdate:'헤더 업데이트: driveReady={driveReady}, driveNeedsConnection={driveNeedsConnection}, email={email}',shareLoading:'공유 설정을 가져오는 중…',shareEmpty:'아직 공유하지 않았습니다.',shareUser:'공유 사용자',shareRole:'뷰어',shareRemoveAria:'공유 해제',publicEmpty:'이 프로젝트에는 아직 항목이 없습니다.',publicMemoError:'이 메모를 표시할 수 없습니다.',publicHomeAria:'프로젝트 목록으로',publicManage:'편집 모드',publicMeta:'{count}개',driveSessionRequired:'Drive에 연결해야 합니다. 헤더의 "Drive 연결"에서 연결하세요.',driveAuthFail:'공개 페이지 Drive 인증 실패. 자동 OAuth를 수행하지 않습니다.',publicProjectFetchFailed:'공개 프로젝트 가져오기 실패',publicProjectLoaded:'공개 프로젝트 JSON 가져오기 성공',publicMemoLoaded:'공유 메모 본문 가져오기 성공',publicMemoFetchFailed:'공유 메모 본문 가져오기 실패',thumbnailQueued:'썸네일을 큐에 등록했습니다',thumbnailFallback:'썸네일 폴백을 등록했습니다',thumbnailLoadError:'썸네일 img 요소 로드 오류',thumbnailDirectFailed:'Drive thumbnailLink 폴백도 실패했습니다',thumbnailDecodeError:'Worker가 반환한 썸네일 이미지 디코딩 실패',thumbnailAuthFallback:'Worker 인증 가져오기 실패로 thumbnailLink를 직접 시도합니다',thumbnailAuthStop:'Drive 권한으로 Worker 경로 썸네일 가져오기 중단',thumbnailNoConditions:'썸네일 등록 조건을 충족하지 않습니다',thumbnailDomNotConnected:'DOM 연결 전 썸네일 등록 거부',thumbnailError:'썸네일 가져오기 실패. 아이콘을 표시합니다.',thumbnailRetry:'Drive 썸네일 가져오기를 재시도합니다',thumbnailStateLoaded:'썸네일 표시 성공',staticEvents:'정적 이벤트를 등록했습니다',initComplete:'Files Taco 초기화 완료',initFailed:'Files Taco 초기화 실패',startupNoOAuth:'시작 시 Google Drive OAuth 팝업을 열지 않습니다',projectListLoading:'프로젝트 목록을 로드하는 중…',publicPageLoading:'보기 페이지를 로드하는 중…',shareSettingFetchFailed:'공유 설정 가져오기 실패',shareFetchFailed:'공유 설정을 가져올 수 없습니다',shareAdded:'{email}에 공유했습니다',shareSuccess:'공유 성공',shareFailed:'공유 실패',shareUrlCopyFailed:'공유 링크 복사 실패',shareUrlCopied:'공유 링크를 복사했습니다',shareLinkDisplayFailed:'공유 링크를 표시할 수 없습니다',shareLinkDialogShown:'공유 링크 다이얼로그를 표시했습니다',shareLinkSelectFailed:'공유 링크 입력란 선택 실패',shareLinkEmpty:'복사 대상 공유 링크가 비어 있습니다',shareLinkNoDom:'공유 링크 복사용 DOM이 없습니다',shareLinkNoDom2:'공유 링크 다이얼로그의 필수 DOM이 없습니다',projectIdMissing:'공유 링크 표시 대상 프로젝트 ID가 없습니다',ownerNotAllowed:'소유자가 아니므로 편집 모드 버튼을 표시하지 않습니다',publicItemsNotFound:'공개 항목 컨테이너를 찾을 수 없습니다',driveUserMissing:'Drive 사용자 정보 가져오기 시 액세스 토큰이 없습니다',driveTokenMissing2:'Google Drive 액세스 토큰을 가져올 수 없습니다',driveTokenError2:'Google Drive 액세스 토큰 가져오기 실패',driveTokenSuccess2:'Google Drive 액세스 토큰 가져오기 성공',driveGisError:'Google Identity Services API를 사용할 수 없습니다',driveGisLoadError:'Google Identity Services 로드 실패',driveTokenClientInit2:'Google Drive Token Client 초기화 완료',driveSessionLoadFailed:'Drive 세션 로드 실패',driveSessionDeleteFailed:'Drive 세션 삭제 실패',driveGrantSaveFailed2:'Drive 인증 상태 저장 실패',driveGrantLoadFailed:'Drive 인증 상태 로드 실패',driveSessionSave:'Drive 세션을 저장했습니다',driveSessionClear:'Drive 세션을 해제했습니다',driveSessionRestore:'저장된 Drive 세션을 복원했습니다',driveGrantSave:'Google Drive 인증 상태를 저장했습니다',driveConnectVerified:'저장된 Drive 세션을 검증했습니다',driveConnectRedirect:'저장된 Drive 연결 확인 후 프로젝트 목록으로 이동',driveConnectAutoRedirect:'Drive 연결/인증 완료 후 프로젝트 목록으로 자동 이동',driveConnectFetchFailed:'Drive 연결 후 프로젝트 목록 가져오기 실패했습니다',driveConnectStart2:'Google Drive 연결 시작: interactive={interactive}, force={force}',driveTokenRequest2:'Drive 액세스 토큰 요청: interactive={interactive}, prompt={prompt}',driveTokenRequestFailed2:'Drive 액세스 토큰 요청 시작 실패',driveConnectUserStart2:'사용자 작업으로 Drive 연결 시작',driveConnectUserSuccess2:'사용자 작업으로 Drive 연결 완료',driveConnectUserFailed2:'사용자 작업으로 Drive 연결 실패',api401NoAutoOAuth2:'Worker가 401을 반환하여 자동 OAuth를 수행하지 않고 Drive 연결 버튼을 표시합니다',api401AuthRequired2:'Drive 인증 필요 상태를 UI에 반영했습니다',projectListEmpty2:'프로젝트 목록: 0개',projectListCount2:'프로젝트 목록: {count}개',projectListFetched2:'프로젝트 목록 가져옴: {count}개',projectFetchFailed2:'프로젝트 목록 가져오기 실패',projectCreateSuccess2:'프로젝트 생성 성공',projectCreateFailed2:'프로젝트 생성 실패',itemCount2:'항목: {count}',memoIdNotFound2:'메모 ID가 없습니다',memoFetchFailed2:'메모 본문 가져오기 실패',memoFetchComplete2:'메모 본문 가져옴: {count}개',managerFetchSuccess2:'관리자 화면 가져오기 성공',managerCacheFallback2:'서버 가져오기 실패로 방금 생성된 데이터를 표시합니다',downloadComplete2:'파일 다운로드 완료',downloadUrlReleaseFailed2:'다운로드 URL 해제 실패',fileAddSuccess2:'파일 추가 성공',fileAddFailed2:'파일 추가 실패',downloadStart2:'파일 다운로드 시작',snackbarMessage2:'Snackbar: {message}',snackbarError2:'Snackbar: {message}',headerUpdate2:'헤더 업데이트: driveReady={driveReady}, driveNeedsConnection={driveNeedsConnection}, email={email}'};</script>
+  <script type="module" src="../src/files-taco//app.js"></script>
+</body>
+</html>

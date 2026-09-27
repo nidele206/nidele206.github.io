@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Files Taco - Google Driveでファイル、Docs、Sheets、Slides、Forms、メモ、Webリンクをプロジェクト単位で管理・共有">
+  <meta name="color-scheme" content="light dark">
+  <title>Files Taco</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://esm.run" crossorigin>
+  <link rel="stylesheet" href="../src/files-taco/style.css">
+</head>
+<body>
+  <div class="ft-app-shell">
+<div class="ft-content-shell">
+      <header class="ft-topbar">
+        <a class="ft-brand" href="./" aria-label="Files Taco ホーム">
+          <img class="ft-brand-icon" src="../src/files-taco/icon.svg" alt="" width="36" height="36">
+          <span class="ft-brand-name">Files Taco</span>
+        </a>
+        <div class="ft-topbar-actions">
+          <span id="ft-auth-status" class="ft-account-label" aria-live="polite"></span>
+          <md-outlined-button id="ft-drive-connect-button" class="is-hidden">Driveへ接続</md-outlined-button>
+          <md-text-button id="ft-logout-button" class="is-hidden">接続解除</md-text-button>
+        </div>
+      </header>
+
+    <div id="ft-busy-overlay" class="ft-busy-overlay" aria-hidden="true">
+      <div class="ft-busy-card" role="status" aria-live="polite" aria-label="処理中">
+        <div id="ft-busy-label" class="ft-busy-label">処理中…</div>
+        <md-linear-progress indeterminate aria-label="処理中"></md-linear-progress>
+      </div>
+    </div>
+
+    <main class="ft-main">
+      <section id="ft-home-view" class="ft-view" aria-labelledby="ft-home-title">
+        <div class="ft-home-layout">
+          <div class="ft-home-copy">
+            <h1 id="ft-home-title">ファイルを、ひとつのプロジェクトに。</h1>
+            <p class="ft-home-lead">Google Driveの実ファイルを中心に、Docs、Sheets、Slides、Forms、メモ、Webリンクをひとつのプロジェクトへまとめます。</p>
+            <div class="ft-home-actions">
+              <md-filled-button id="ft-home-login-button">Google Driveに接続</md-filled-button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ft-dashboard-view" class="ft-view is-hidden" aria-labelledby="ft-dashboard-title">
+        <div class="ft-page-header">
+          <div>
+            <h1 id="ft-dashboard-title">プロジェクト</h1>
+          </div>
+        </div>
+
+        <div class="ft-dashboard-toolbar">
+          <md-filled-button id="ft-create-project-button" has-icon>
+            <md-icon slot="icon">add</md-icon>
+            新しいプロジェクト
+          </md-filled-button>
+        </div>
+
+        <div id="ft-project-list" class="ft-project-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="ft-project-manager-view" class="ft-view is-hidden" aria-labelledby="ft-manager-title">
+        <div id="ft-manager-content"></div>
+      </section>
+
+      <section id="ft-public-view" class="ft-view is-hidden" aria-labelledby="ft-public-title">
+        <div id="ft-public-project"></div>
+      </section>
+    </main>
+
+    <div id="ft-snackbar" class="ft-snackbar" role="status" aria-live="polite" aria-atomic="true">
+      <span class="ft-snackbar-icon material-symbols-rounded" data-snackbar-icon aria-hidden="true">check_circle</span>
+      <span id="ft-snackbar-message" class="ft-snackbar-message"></span>
+    </div>
+
+    <md-dialog id="ft-name-dialog">
+      <div slot="headline" id="ft-name-dialog-title">名前を変更</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-name-dialog-input" label="名前" required></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-name-dialog-cancel">キャンセル</md-text-button>
+        <md-filled-button id="ft-name-dialog-confirm">変更</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-delete-dialog" type="alert">
+      <div slot="headline">削除しますか？</div>
+      <div slot="content" id="ft-delete-dialog-content" class="ft-dialog-text"></div>
+      <div slot="actions">
+        <md-text-button id="ft-delete-dialog-cancel">キャンセル</md-text-button>
+        <md-filled-button id="ft-delete-dialog-confirm">削除</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-project-create-dialog">
+      <div slot="headline">新しいプロジェクト</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-project-create-name" label="プロジェクト名" required></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-project-create-cancel">キャンセル</md-text-button>
+        <md-filled-button id="ft-project-create-confirm">作成</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-create-dialog">
+      <div slot="headline" id="ft-create-dialog-title">追加</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-create-dialog-name" label="名前" required></md-outlined-text-field>
+        <md-outlined-text-field id="ft-create-dialog-url" label="URL" type="url" class="is-hidden"></md-outlined-text-field>
+        <md-outlined-text-field id="ft-create-dialog-content-input" label="メモ" type="textarea" rows="6" class="is-hidden"></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-create-dialog-cancel">キャンセル</md-text-button>
+        <md-filled-button id="ft-create-dialog-confirm">追加</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-share-dialog">
+      <div slot="headline" class="ft-dialog-headline-with-close">
+        <span>プロジェクトを共有</span>
+        <md-icon-button id="ft-share-close-button" aria-label="閉じる"><md-icon>close</md-icon></md-icon-button>
+      </div>
+      <div slot="content" class="ft-share-content">
+        <div class="ft-share-entry">
+          <md-outlined-text-field id="ft-share-email" label="Googleアカウント" type="email" placeholder="example@gmail.com"></md-outlined-text-field>
+          <md-filled-button id="ft-share-add-button">共有</md-filled-button>
+        </div>
+        <div id="ft-share-list" class="ft-share-list"></div>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-share-link-dialog">
+      <div slot="headline" class="ft-dialog-headline-with-close">
+        <span>共有リンク</span>
+        <md-icon-button id="ft-share-link-close-button" aria-label="閉じる">
+          <md-icon>close</md-icon>
+        </md-icon-button>
+      </div>
+      <div slot="content" class="ft-dialog-content ft-share-link-content">
+        <md-outlined-text-field id="ft-share-link-input" label="共有リンク" type="url" readonly></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-share-link-copy-button">コピー</md-text-button>
+      </div>
+    </md-dialog>
+    </div>
+  </div>
+
+  <script>window.STRINGS={busyDefault:'処理中…',driveConnected:'Google Drive接続済み',logout:'接続解除',connectDrive:'Google Driveに接続しました',driveConnectFailed:'Driveに接続できませんでした: {error}',disconnectDrive:'Google Driveとの接続を解除しました',allowDriveAccess:'Google Driveへの接続を許可してください。',driveConnectionRequired:'Google Driveへの接続が必要です',driveAuthRequired:'Drive認証が必要な状態をUIへ反映しました',noAutoOAuth:'起動・自動処理ではGoogle Drive OAuthポップアップを開きません',noProjects:'プロジェクトはありません。',projectListEmpty:'プロジェクト一覧: 0件',projectListCount:'プロジェクト一覧表示: {count}件',projectListFetched:'プロジェクト一覧取得: {count}件',projectFetchFailed:'プロジェクトを取得できませんでした: {error}',projectCreateSuccess:'プロジェクトを作成しました',projectCreateFailed:'作成できませんでした: {error}',projectCreating:'プロジェクトを作成しています…',projectNameRequired:'プロジェクト名を入力してください',projectNameFallback:'名称未設定',noItems:'まだアイテムがありません。',itemCount:'アイテム表示: {count}件',itemKindMemo:'メモ',itemKindWeb:'Webリンク',itemNameFallback:'名称未設定',memoLoading:'メモを読み込んでいます…',memoPlaceholder:'メモ内容',memoPlaceholderShort:'メモ',nameDialogTitleProject:'プロジェクト名を変更',nameDialogTitleItem:'名前を変更',nameInputRequired:'名前を入力してください',createDialogTitleDocument:'Google Docsを作成',createDialogTitleSpreadsheet:'Google Sheetsを作成',createDialogTitlePresentation:'Google Slidesを作成',createDialogTitleForm:'Google Formsを作成',createDialogTitleMemo:'メモを追加',createDialogTitleWeb:'Webリンクを追加',createDialogConfirmAdd:'追加',createDialogConfirmCreate:'作成',shareTitle:'プロジェクトを共有',shareLinkTitle:'共有リンク',shareEmailLabel:'Googleアカウント',shareAddButton:'共有',shareCopyButton:'コピー',shareCloseButton:'閉じる',managerBack:'プロジェクト一覧へ戻る',managerView:'閲覧モード',managerShareLink:'共有リンク',managerRename:'名前を変更',managerShare:'共有',addFile:'ファイル',addMemo:'メモ',addWeb:'Web',openLink:'開く',viewButton:'閲覧',editButton:'編集',downloadButton:'ダウンロード',renameButton:'名前変更',deleteButton:'削除',openButtonAria:'開く',downloadAria:'ダウンロード',renameAria:'名前変更',deleteAria:'削除',downloadInvalidTarget:'ダウンロード対象が不正です',downloadNotFound:'ダウンロード対象を確認できませんでした',downloadNotFile:'ダウンロード対象が通常ファイルではありません',downloadNotAvailable:'このアイテムはダウンロード対象ではありません',downloadStart:'ファイルダウンロード開始',downloadComplete:'ファイルダウンロード完了',downloadUrlReleaseFailed:'ダウンロードURL解放失敗',downloadStarted:'ダウンロードを開始しました',downloadFailed:'ダウンロードできませんでした: {error}',uploadContainerNotFound:'アップロード先コンテナがありません',fileAdded:'ファイルを追加しました',fileAddFailed:'ファイルを追加できませんでした: {error}',fileAddSuccess:'ファイル追加成功',fileAddError:'ファイル追加失敗',itemOpenNoLink:'開くためのリンクがありません',deleteConfirm:'「{label}」を削除します。Google Drive上でもゴミ箱へ移動します。',deleteItem:'削除しました',deleteSuccess:'アイテム削除成功',deleteFailed:'アイテム削除失敗',deleteError:'削除できませんでした: {error}',renameSuccess:'名前を変更しました',renameItemSuccess:'名前を変更しました',renameSuccessLog:'名前変更成功',renameFailedLog:'名前変更失敗',renameError:'名前を変更できませんでした: {error}',managerSubCount:'件',snackbarDomNotFound:'SnackbarのDOMがありません',snackbarIconNotFound:'Snackbarアイコンがありません',projectCardButtonsFailed:'プロジェクト操作ボタン生成失敗',thumbnailTargetNotFound:'サムネイル対象画像がありません',thumbnailPreviewNotFound:'サムネイルプレビュー領域がありません',thumbnailPlaceholderNotFound:'サムネイルプレースホルダーがありません',downloadTargetInvalid:'ダウンロード対象が不正です',downloadTargetNotFound:'ダウンロード対象を確認できませんでした',downloadNotFile:'ダウンロード対象が通常ファイルではありません',downloadNotAvailable:'このアイテムはダウンロード対象ではありません',downloadStart:'ファイルダウンロード開始',downloadComplete:'ファイルダウンロード完了',downloadUrlReleaseFailed:'ダウンロードURL解放失敗',downloadStarted:'ダウンロードを開始しました',downloadFailed:'ダウンロードできませんでした: {error}',uploadContainerNotFound:'アップロード先コンテナがありません',fileAdded:'ファイルを追加しました',fileAddFailed:'ファイルを追加できませんでした: {error}',fileAddSuccess:'ファイル追加成功',fileAddError:'ファイル追加失敗',itemOpenNoLink:'開くためのリンクがありません',itemDeleteConfirm:'「{label}」を削除します。Google Drive上でもゴミ箱へ移動します。',memoIdNotFound:'メモIDがありません',memoFetchFailed:'メモ本文取得失敗',memoFetchError:'メモを読み込めませんでした: {error}',memoFetchComplete:'メモ本文取得完了: {count}件',managerFetchSuccess:'管理画面取得成功',managerCacheFallback:'サーバー取得失敗のため作成直後のデータを表示します',managerCacheFallbackMsg:'最新情報を取得できなかったため、表示を一時的に保持しています',managerOpenFailed:'プロジェクトを開けませんでした: {error}',notProjectOwner:'このプロジェクトの作成者ではありません',urlProtocolRequired:'http:// または https:// のURLを入力してください',domInitFailed:'DOM初期化に失敗しました',domInitComplete:'DOM初期化完了',missingDom:'必須DOMがありません: {key}',viewNotFound:'ビューがありません: {key}',viewChanged:'表示ビュー: {name}',overlayNotFound:'処理オーバーレイがありません',progressFadeComplete:'Progressフェードアウト完了',progressShown:'Progress表示: {message}',driveSessionSaved:'Driveセッションを保存しました',driveSessionCleared:'Driveセッションを解除しました',driveSessionRestored:'保存済みDriveセッションを復元しました',driveGrantSaved:'Google Drive認可済み状態を保存しました',driveGrantSaveFailed:'Drive認可状態の保存失敗',driveGisLoaded:'Google Identity Services読み込み完了',driveGisApiUnavailable:'Google Identity ServicesのAPIが利用できません',driveGisLoadFailed:'Google Identity Services読み込み失敗',driveTokenClientInit:'Google Drive Token Client初期化完了',driveTokenMissing:'Google Driveアクセストークンを取得できませんでした',driveTokenError:'Google Driveアクセストークン取得失敗',driveTokenSuccess:'Google Driveアクセストークン取得成功',driveUserTokenMissing:'Driveユーザー情報取得時のアクセストークンがありません',driveUserSuccess:'Google Driveユーザー情報取得成功',driveUserFailed:'Google Driveユーザー情報取得失敗',driveSessionValidated:'保存済みDriveセッションを検証しました',driveRedirectToProjects:'保存済みDrive接続確認後にプロジェクト一覧へ移動しました',driveAutoRedirect:'Drive接続・認可完了後にプロジェクト一覧へ自動遷移しました',driveFetchFailed:'Drive接続後のプロジェクト一覧取得に失敗しました',driveConnectStart:'Google Drive接続開始: interactive={interactive}, force={force}',driveTokenRequest:'Driveアクセストークン要求: interactive={interactive}, prompt={prompt}',driveTokenRequestFailed:'Driveアクセストークン要求開始失敗',driveConnectUserStart:'ユーザー操作によるDrive接続を開始します',driveConnectUserSuccess:'ユーザー操作によるDrive接続が完了しました',driveConnectUserFailed:'ユーザー操作によるDrive接続失敗',apiJsonParseFailed:'JSONレスポンス解析失敗',api401NoAutoOAuth:'Workerが401を返したため自動OAuthは行わず、Drive接続ボタンを表示します',api401AuthRequired:'Drive認証が必要な状態をUIへ反映しました',projectListEmpty:'プロジェクト一覧: 0件',projectListCount:'プロジェクト一覧表示: {count}件',projectListFetched:'プロジェクト一覧取得: {count}件',projectFetchFailed:'プロジェクト一覧取得失敗',projectCreateSuccess:'プロジェクト作成成功',projectCreateFailed:'プロジェクト作成失敗',itemCount:'アイテム表示: {count}件',memoIdNotFound:'メモIDがありません',memoFetchFailed:'メモ本文取得失敗',memoFetchComplete:'メモ本文取得完了: {count}件',managerFetchSuccess:'管理画面取得成功',managerCacheFallback:'サーバー取得失敗のため作成直後のデータを表示します',downloadComplete:'ファイルダウンロード完了',downloadUrlReleaseFailed:'ダウンロードURL解放失敗',fileAddSuccess:'ファイル追加成功',fileAddFailed:'ファイル追加失敗',downloadStart:'ファイルダウンロード開始',snackbarMessage:'Snackbar: {message}',snackbarError:'Snackbar: {message}',headerUpdate:'ヘッダー更新: driveReady={driveReady}, driveNeedsConnection={driveNeedsConnection}, email={email}',shareLoading:'共有設定を取得中…',shareEmpty:'まだ共有していません。',shareUser:'共有ユーザー',shareRole:'閲覧者',shareRemoveAria:'共有を解除',publicEmpty:'このプロジェクトにはまだアイテムがありません。',publicMemoError:'このメモを表示できません。',publicHomeAria:'プロジェクト一覧へ戻る',publicManage:'編集モード',publicMeta:'{count} 件',driveSessionRequired:'Driveへの接続が必要です。ヘッダーの「Driveへ接続」から接続してください。',driveAuthFail:'共有ページのDrive認証失敗。自動OAuthは行いません。',publicProjectFetchFailed:'公開プロジェクト取得失敗',publicProjectLoaded:'公開プロジェクトJSON取得成功',publicMemoLoaded:'共有メモ本文取得成功',publicMemoFetchFailed:'共有メモ本文取得失敗',thumbnailQueued:'サムネイルをキューへ登録しました',thumbnailFallback:'サムネイルフォールバックを登録しました',thumbnailLoadError:'サムネイルimg要素の読み込みエラー',thumbnailDirectFailed:'Drive thumbnailLinkフォールバックも失敗しました',thumbnailDecodeError:'Workerが返したサムネイル画像のデコードに失敗しました',thumbnailAuthFallback:'Worker認証取得失敗のためthumbnailLinkを直接試します',thumbnailAuthStop:'Drive権限のためWorker経由サムネイル取得を停止しました',thumbnailNoConditions:'サムネイル登録条件を満たしていません',thumbnailDomNotConnected:'DOM接続前のサムネイル登録を拒否しました',thumbnailError:'サムネイル取得失敗。アイコンを表示します',thumbnailRetry:'Driveサムネイル取得を再試行します',thumbnailStateLoaded:'サムネイル表示成功',staticEvents:'静的イベントを登録しました',initComplete:'Files Taco初期化完了',initFailed:'Files Taco初期化失敗',startupNoOAuth:'起動時はGoogle Drive OAuthポップアップを開きません',projectListLoading:'プロジェクト一覧を読み込んでいます…',publicPageLoading:'閲覧ページを読み込んでいます…',shareSettingFetchFailed:'共有設定取得失敗',shareFetchFailed:'共有設定を取得できませんでした',shareAdded:'{email} に共有しました',shareSuccess:'共有成功',shareFailed:'共有失敗',shareUrlCopyFailed:'共有リンクコピー失敗',shareUrlCopied:'共有リンクをコピーしました',shareLinkDisplayFailed:'共有リンクを表示できませんでした',shareLinkDialogShown:'共有リンクダイアログを表示しました',shareLinkSelectFailed:'共有リンク入力欄の選択に失敗しました',shareLinkEmpty:'コピー対象の共有リンクが空です',shareLinkNoDom:'共有リンクコピー用DOMがありません',shareLinkNoDom2:'共有リンクダイアログの必須DOMがありません',projectIdMissing:'共有リンク表示対象のプロジェクトIDがありません',ownerNotAllowed:'所有者でないため編集モードボタンを表示しません',publicItemsNotFound:'公開アイテムコンテナが見つかりません',driveUserMissing:'Driveユーザー情報取得時のアクセストークンがありません',driveTokenMissing2:'Google Driveアクセストークンを取得できませんでした',driveTokenError2:'Google Driveアクセストークン取得失敗',driveTokenSuccess2:'Google Driveアクセストークン取得成功',driveGisError:'Google Identity ServicesのAPIが利用できません',driveGisLoadError:'Google Identity Services読み込み失敗',driveTokenClientInit2:'Google Drive Token Client初期化完了',driveSessionLoadFailed:'Driveセッション読み込み失敗',driveSessionDeleteFailed:'Driveセッション削除失敗',driveGrantSaveFailed2:'Drive認可状態の保存失敗',driveGrantLoadFailed:'Drive認可状態の読み込み失敗',driveSessionSave:'Driveセッションを保存しました',driveSessionClear:'Driveセッションを解除しました',driveSessionRestore:'保存済みDriveセッションを復元しました',driveGrantSave:'Google Drive認可済み状態を保存しました',driveConnectVerified:'保存済みDriveセッションを検証しました',driveConnectRedirect:'保存済みDrive接続確認後にプロジェクト一覧へ移動しました',driveConnectAutoRedirect:'Drive接続・認可完了後にプロジェクト一覧へ自動遷移しました',driveConnectFetchFailed:'Drive接続後のプロジェクト一覧取得に失敗しました',driveConnectStart2:'Google Drive接続開始: interactive={interactive}, force={force}',driveTokenRequest2:'Driveアクセストークン要求: interactive={interactive}, prompt={prompt}',driveTokenRequestFailed2:'Driveアクセストークン要求開始失敗',driveConnectUserStart2:'ユーザー操作によるDrive接続を開始します',driveConnectUserSuccess2:'ユーザー操作によるDrive接続が完了しました',driveConnectUserFailed2:'ユーザー操作によるDrive接続失敗',api401NoAutoOAuth2:'Workerが401を返したため自動OAuthは行わず、Drive接続ボタンを表示します',api401AuthRequired2:'Drive認証が必要な状態をUIへ反映しました',projectListEmpty2:'プロジェクト一覧: 0件',projectListCount2:'プロジェクト一覧表示: {count}件',projectListFetched2:'プロジェクト一覧取得: {count}件',projectFetchFailed2:'プロジェクト一覧取得失敗',projectCreateSuccess2:'プロジェクト作成成功',projectCreateFailed2:'プロジェクト作成失敗',itemCount2:'アイテム表示: {count}件',memoIdNotFound2:'メモIDがありません',memoFetchFailed2:'メモ本文取得失敗',memoFetchComplete2:'メモ本文取得完了: {count}件',managerFetchSuccess2:'管理画面取得成功',managerCacheFallback2:'サーバー取得失敗のため作成直後のデータを表示します',downloadComplete2:'ファイルダウンロード完了',downloadUrlReleaseFailed2:'ダウンロードURL解放失敗',fileAddSuccess2:'ファイル追加成功',fileAddFailed2:'ファイル追加失敗',downloadStart2:'ファイルダウンロード開始',snackbarMessage2:'Snackbar: {message}',snackbarError2:'Snackbar: {message}',headerUpdate2:'ヘッダー更新: driveReady={driveReady}, driveNeedsConnection={driveNeedsConnection}, email={email}'};</script>
+  <script type="module" src="../src/files-taco//app.js"></script>
+</body>
+</html>
