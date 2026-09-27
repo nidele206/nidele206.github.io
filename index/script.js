@@ -16,21 +16,33 @@
 
         const lang = getLanguageFromURL();
 
-        const langNames = {
-          ja: "日本語",
-          en: "English",
-          zh: "中文",
-          "zh-tw": "繁体中文",
-          ko: "한국어",
-          kp: "조선어",
-          ru: "русский",
-          hi: "हिन्दी"
-        };
+const langNames = {
+  ja: "日本語",
+  en: "English",
+  zh: "中文",
+  "zh-tw": "繁体中文",
+  kr: "한국어",
+  kp: "조선어",
+  ru: "русский",
+  hi: "हिन्दी"
+};
 
-        const langCurrentText = document.getElementById("lang-current-text");
-        if (langCurrentText) {
-          langCurrentText.innerHTML = `現在<b>${langNames[lang] || lang}ページ</b>を<br>閲覧中です。`;
-        }
+const langCurrentTexts = {
+  ja: (l) => `現在<b>${l}</b>ページを<br>閲覧中です。`,
+  en: (l) => `Currently viewing the <b>${l}</b> page.`,
+  zh: (l) => `正在浏览<b>${l}</b>页面。`,
+  "zh-tw": (l) => `正在瀏覽<b>${l}</b>頁面。`,
+  kr: (l) => `현재 <b>${l}</b> 페이지를<br>보고 있습니다`,
+  kp: (l) => `현재 <b>${l}</b> 페이지를<br>보고 있습니다`,
+  ru: (l) => `Сейчас вы просматриваете страницу <b>${l}</b>.`,
+  hi: (l) => `वर्तमान में <b>${l}</b> पृष्ठ देख रहे हैं।`
+};
+
+const langCurrentText = document.getElementById("lang-current-text");
+if (langCurrentText) {
+  const currentLangName = langNames[lang] || lang;
+  langCurrentText.innerHTML = langCurrentTexts[lang] ? langCurrentTexts[lang](currentLangName) : langCurrentTexts.ja(currentLangName);
+}
 
         const langDialogOverlay = document.createElement("div");
         langDialogOverlay.className = "lang-dialog-overlay";
@@ -39,13 +51,24 @@
         const langDialog = document.createElement("div");
         langDialog.className = "lang-dialog";
 
-        const langDialogH2 = document.createElement("h2");
-        langDialogH2.textContent = "Language";
-        langDialog.appendChild(langDialogH2);
+const langDialogH2Texts = {
+  ja: "言語",
+  en: "Language",
+  zh: "语言",
+  "zh-tw": "語言",
+  kr: "한국어",
+  kp: "조선어",
+  ru: "Язык",
+  hi: "भाषा"
+};
+
+const langDialogH2 = document.createElement("h2");
+langDialogH2.textContent = langDialogH2Texts[lang] || langDialogH2Texts.ja;
+langDialog.appendChild(langDialogH2);
 
         const langFlags = {
           ja: "🇯🇵", en: "🇬🇧", zh: "🇨🇳", "zh-tw": "🇨🇳",
-          ko: "🇰🇷", kp: "🇰🇵", ru: "🇷🇺", hi: "🇮🇳"
+          kr: "🇰🇷", kp: "🇰🇵", ru: "🇷🇺", hi: "🇮🇳"
         };
 
         const langHrefs = {
@@ -53,7 +76,7 @@
           en: "https://nidele206.github.io/i/en",
           zh: "https://nidele206.github.io/i/zh",
           "zh-tw": "https://nidele206.github.io/i/zh-tw",
-          ko: "https://nidele206.github.io/i/ko",
+          kr: "https://nidele206.github.io/i/kr",
           kp: "https://nidele206.github.io/i/kp",
           ru: "https://nidele206.github.io/i/ru",
           hi: "https://nidele206.github.io/i/hi"
@@ -77,9 +100,9 @@
         document.body.appendChild(langDialogOverlay);
         langDialogOverlay.appendChild(langDialog);
 
-        const langBtn = document.getElementById("lang-btn");
-        if (langBtn && langDialogOverlay) {
-          langBtn.addEventListener("click", () => {
+const langBtn = document.getElementById("lang-btn");
+if (langBtn && langDialogOverlay) {
+  langBtn.addEventListener("click", () => {
             langDialogOverlay.classList.toggle("open");
           });
           langDialogOverlay.addEventListener("click", (e) => {
@@ -98,16 +121,16 @@
           en: "https://nidele206.github.io/product/en/",
           zh: "https://nidele206.github.io/product/zh/",
           "zh-tw": "https://nidele206.github.io/product/zh-tw/",
-          ko: "https://nidele206.github.io/product/ko/",
+          kr: "https://nidele206.github.io/product/kr/",
           kp: "https://nidele206.github.io/product/kp/",
           ru: "https://nidele206.github.io/product/ru/",
           hi: "https://nidele206.github.io/product/hi/"
         };
 
         const products = [
-          { path: "oneul-launcher", img: "https://nidele206.github.io/imgs/oneul-launcher.png", label: "Oneul launcher", bg: "#0070F9", desc: { ja: "より良い生活のためのランチャー", en: "A launcher for a better life", zh: "为更好生活而生的启动器", "zh-tw": "為更好生活而生的啟動器", ko: "더 나은 삶을 위한 런처", kp: "더 나은 삶을 위한 런처", ru: "Лаунчер для лучшей жизни", hi: "बेहतर जीवन के लिए लॉन्चर" } },
-          { path: "wo-checker", img: "https://nidele206.github.io/imgs/wo-checker.png", label: "Wo Checker", bg: "#FFD53B", desc: { ja: "文章の誤字脱字をチェック", en: "Check typos and errors", zh: "检查文章中的错别字", "zh-tw": "檢查文章中的錯別字", ko: "글의 오타를 확인하세요", kp: "글의 오타를 확인하세요", ru: "Проверьте опечатки", hi: "टाइपो जांचें" } },
-          { path: "easy-flowchart", img: "https://nidele206.github.io/imgs/easy-flowchart.png", label: "Easy Flowchart", bg: "#0090FF", desc: { ja: "簡単にフローチャートを作成", en: "Create flowcharts easily", zh: "轻松创建流程图", "zh-tw": "輕鬆創建流程圖", ko: "쉽게 플로우차트 만들기", kp: "쉽게 플로우차트 만들기", ru: "Легко создавать блок-схемы", hi: "आसानी से फ्लोचार्ट बनाएं" } }
+          { path: "oneul-launcher", img: "https://nidele206.github.io/imgs/oneul-launcher.svg", label: "Oneul launcher", bg: "#0070F9", desc: { ja: "より良い生活のためのランチャー", en: "A launcher for a better life", zh: "为更好生活而生的启动器", "zh-tw": "為更好生活而生的啟動器", kr: "더 나은 삶을 위한 런처", kp: "더 나은 삶을 위한 런처", ru: "Лаунчер для лучшей жизни", hi: "बेहतर जीवन के लिए लॉन्चर" } },
+          { path: "wo-checker", img: "https://nidele206.github.io/imgs/wo-checker.svg", label: "Wo Checker", bg: "#FFD53B", desc: { ja: "文章の誤字脱字をチェック", en: "Check typos and errors", zh: "检查文章中的错别字", "zh-tw": "檢查文章中的錯別字", kr: "글의 오타를 확인하세요", kp: "글의 오타를 확인하세요", ru: "Проверьте опечатки", hi: "टाइपो जांचें" } },
+          { path: "easy-flowchart", img: "https://nidele206.github.io/imgs/easy-flowchart.svg", label: "Easy Flowchart", bg: "#0090FF", desc: { ja: "簡単にフローチャートを作成", en: "Create flowcharts easily", zh: "轻松创建流程图", "zh-tw": "輕鬆創建流程圖", kr: "쉽게 플로우차트 만들기", kp: "쉽게 플로우차트 만들기", ru: "Легко создавать блок-схемы", hi: "आसानी से फ्लोचार्ट बनाएं" } }
         ];
 
         function isLightColor(hex) {
