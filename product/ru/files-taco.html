@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Files Taco - Управляйте и делитесь файлами, Docs, Sheets, Slides, Forms, заметками и веб-ссылками по проектам в Google Drive.">
+  <meta name="color-scheme" content="light dark">
+  <title>Files Taco</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://esm.run" crossorigin>
+  <link rel="stylesheet" href="../src/files-taco/style.css">
+</head>
+<body>
+  <div class="ft-app-shell">
+<div class="ft-content-shell">
+      <header class="ft-topbar">
+        <a class="ft-brand" href="./" aria-label="Files Taco Главная">
+          <img class="ft-brand-icon" src="../src/files-taco/icon.svg" alt="" width="36" height="36">
+          <span class="ft-brand-name">Files Taco</span>
+        </a>
+        <div class="ft-topbar-actions">
+          <span id="ft-auth-status" class="ft-account-label" aria-live="polite"></span>
+          <md-outlined-button id="ft-drive-connect-button" class="is-hidden">Подключить Drive</md-outlined-button>
+          <md-text-button id="ft-logout-button" class="is-hidden">Отключить</md-text-button>
+        </div>
+      </header>
+
+    <div id="ft-busy-overlay" class="ft-busy-overlay" aria-hidden="true">
+      <div class="ft-busy-card" role="status" aria-live="polite" aria-label="Обработка">
+        <div id="ft-busy-label" class="ft-busy-label">Обработка…</div>
+        <md-linear-progress indeterminate aria-label="Обработка"></md-linear-progress>
+      </div>
+    </div>
+
+    <main class="ft-main">
+      <section id="ft-home-view" class="ft-view" aria-labelledby="ft-home-title">
+        <div class="ft-home-layout">
+          <div class="ft-home-copy">
+            <h1 id="ft-home-title">Файлы в одном проекте.</h1>
+            <p class="ft-home-lead">Сосредоточьте реальные файлы Google Drive и организуйте Docs, Sheets, Slides, Forms, заметки и веб-ссылки в одном проекте.</p>
+            <div class="ft-home-actions">
+              <md-filled-button id="ft-home-login-button">Подключить Google Drive</md-filled-button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="ft-dashboard-view" class="ft-view is-hidden" aria-labelledby="ft-dashboard-title">
+        <div class="ft-page-header">
+          <div>
+            <h1 id="ft-dashboard-title">Проекты</h1>
+          </div>
+        </div>
+
+        <div class="ft-dashboard-toolbar">
+          <md-filled-button id="ft-create-project-button" has-icon>
+            <md-icon slot="icon">add</md-icon>
+            Новый проект
+          </md-filled-button>
+        </div>
+
+        <div id="ft-project-list" class="ft-project-grid" aria-live="polite"></div>
+      </section>
+
+      <section id="ft-project-manager-view" class="ft-view is-hidden" aria-labelledby="ft-manager-title">
+        <div id="ft-manager-content"></div>
+      </section>
+
+      <section id="ft-public-view" class="ft-view is-hidden" aria-labelledby="ft-public-title">
+        <div id="ft-public-project"></div>
+      </section>
+    </main>
+
+    <div id="ft-snackbar" class="ft-snackbar" role="status" aria-live="polite" aria-atomic="true">
+      <span class="ft-snackbar-icon material-symbols-rounded" data-snackbar-icon aria-hidden="true">check_circle</span>
+      <span id="ft-snackbar-message" class="ft-snackbar-message"></span>
+    </div>
+
+    <md-dialog id="ft-name-dialog">
+      <div slot="headline" id="ft-name-dialog-title">Переименовать</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-name-dialog-input" label="Имя" required></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-name-dialog-cancel">Отмена</md-text-button>
+        <md-filled-button id="ft-name-dialog-confirm">Сохранить</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-delete-dialog" type="alert">
+      <div slot="headline">Удалить?</div>
+      <div slot="content" id="ft-delete-dialog-content" class="ft-dialog-text"></div>
+      <div slot="actions">
+        <md-text-button id="ft-delete-dialog-cancel">Отмена</md-text-button>
+        <md-filled-button id="ft-delete-dialog-confirm">Удалить</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-project-create-dialog">
+      <div slot="headline">Новый проект</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-project-create-name" label="Имя проекта" required></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-project-create-cancel">Отмена</md-text-button>
+        <md-filled-button id="ft-project-create-confirm">Создать</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-create-dialog">
+      <div slot="headline" id="ft-create-dialog-title">Добавить</div>
+      <div slot="content" class="ft-dialog-content">
+        <md-outlined-text-field id="ft-create-dialog-name" label="Имя" required></md-outlined-text-field>
+        <md-outlined-text-field id="ft-create-dialog-url" label="URL" type="url" class="is-hidden"></md-outlined-text-field>
+        <md-outlined-text-field id="ft-create-dialog-content-input" label="Заметка" type="textarea" rows="6" class="is-hidden"></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-create-dialog-cancel">Отмена</md-text-button>
+        <md-filled-button id="ft-create-dialog-confirm">Добавить</md-filled-button>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-share-dialog">
+      <div slot="headline" class="ft-dialog-headline-with-close">
+        <span>Поделиться проектом</span>
+        <md-icon-button id="ft-share-close-button" aria-label="Закрыть"><md-icon>close</md-icon></md-icon-button>
+      </div>
+      <div slot="content" class="ft-share-content">
+        <div class="ft-share-entry">
+          <md-outlined-text-field id="ft-share-email" label="Google аккаунт" type="email" placeholder="example@gmail.com"></md-outlined-text-field>
+          <md-filled-button id="ft-share-add-button">Поделиться</md-filled-button>
+        </div>
+        <div id="ft-share-list" class="ft-share-list"></div>
+      </div>
+    </md-dialog>
+
+    <md-dialog id="ft-share-link-dialog">
+      <div slot="headline" class="ft-dialog-headline-with-close">
+        <span>Ссылка для 공유</span>
+        <md-icon-button id="ft-share-link-close-button" aria-label="Закрыть">
+          <md-icon>close</md-icon>
+        </md-icon-button>
+      </div>
+      <div slot="content" class="ft-dialog-content ft-share-link-content">
+        <md-outlined-text-field id="ft-share-link-input" label="Ссылка для 공유" type="url" readonly></md-outlined-text-field>
+      </div>
+      <div slot="actions">
+        <md-text-button id="ft-share-link-copy-button">Копировать</md-text-button>
+      </div>
+    </md-dialog>
+    </div>
+  </div>
+
+  <script>window.STRINGS={busyDefault:'Обработка…',driveConnected:'Google Drive подключен',logout:'Отключить',connectDrive:'Подключено к Google Drive',driveConnectFailed:'Не удалось подключить к Drive: {error}',disconnectDrive:'Отключено от Google Drive',allowDriveAccess:'Пожалуйста, разрешите доступ к Google Drive.',driveConnectionRequired:'Подключение к Google Drive необходимо',driveAuthRequired:'Состояние требования аутентификации Drive отражено в UI',noAutoOAuth:'Всплывающее окно OAuth Google Drive не будет открыто при запуске/автоматической обработке',noProjects:'Нет проектов.',projectListEmpty:'Список проектов: 0 элементов',projectListCount:'Список проектов: {count} элементов',projectListFetched:'Список проектов получен: {count} элементов',projectFetchFailed:'Не удалось получить проекты: {error}',projectCreateSuccess:'Проект создан',projectCreateFailed:'Не удалось создать: {error}',projectCreating:'Создание проекта…',projectNameRequired:'Введите имя проекта',projectNameFallback:'Без названия',noItems:'Нет элементов.',itemCount:'Элементы: {count}',itemKindMemo:'Заметка',itemKindWeb:'Веб-ссылка',itemNameFallback:'Без названия',memoLoading:'Загрузка заметки…',memoPlaceholder:'Содержимое заметки',memoPlaceholderShort:'Заметка',nameDialogTitleProject:'Переименовать проект',nameDialogTitleItem:'Переименовать',nameInputRequired:'Введите имя',createDialogTitleDocument:'Создать Google Doc',createDialogTitleSpreadsheet:'Создать Google Sheet',createDialogTitlePresentation:'Создать Google Slide',createDialogTitleForm:'Создать Google Form',createDialogTitleMemo:'Добавить заметку',createDialogTitleWeb:'Добавить веб-ссылку',createDialogConfirmAdd:'Добавить',createDialogConfirmCreate:'Создать',shareTitle:'Поделиться проектом',shareLinkTitle:'Ссылка для 공유',shareEmailLabel:'Google аккаунт',shareAddButton:'Поделиться',shareCopyButton:'Копировать',shareCloseButton:'Закрыть',managerBack:'К проектам',managerView:'Режим просмотра',managerShareLink:'Ссылка для 공유',managerRename:'Переименовать',managerShare:'Поделиться',addFile:'Файл',addMemo:'Заметка',addWeb:'Веб',openLink:'Открыть',viewButton:'Просмотр',editButton:'Редактировать',downloadButton:'Скачать',renameButton:'Переименовать',deleteButton:'Удалить',openButtonAria:'Открыть',downloadAria:'Скачать',renameAria:'Переименовать',deleteAria:'Удалить',downloadInvalidTarget:'Недопустимая цель загрузки',downloadNotFound:'Не удалось проверить цель загрузки',downloadNotFile:'Цель загрузки не является обычным файлом',downloadNotAvailable:'Этот элемент недоступен для загрузки',downloadStart:'Загрузка файла начата',downloadComplete:'Загрузка файла завершена',downloadUrlReleaseFailed:'Не удалось освободить URL загрузки',downloadStarted:'Загрузка начата',downloadFailed:'Ошибка загрузки: {error}',uploadContainerNotFound:'Контейнер загрузки не найден',fileAdded:'Файл добавлен',fileAddFailed:'Не удалось добавить файл: {error}',fileAddSuccess:'Файл успешно добавлен',fileAddError:'Ошибка добавления файла',itemOpenNoLink:'Нет ссылки для открытия',deleteConfirm:'Удалить "{label}". Также переместить в корзину Google Drive.',deleteItem:'Удалено',deleteSuccess:'Элемент удален',deleteFailed:'Ошибка удаления элемента',deleteError:'Не удалось удалить: {error}',renameSuccess:'Переименовано',renameItemSuccess:'Переименовано',renameSuccessLog:'Переименование успешно',renameFailedLog:'Ошибка переименования',renameError:'Не удалось переименовать: {error}',managerSubCount:'элементов',snackbarDomNotFound:'DOM Snackbar не найден',snackbarIconNotFound:'Иконка Snackbar не найдена',projectCardButtonsFailed:'Не удалось создать кнопки действий проекта',thumbnailTargetNotFound:'Целевое изображение миниатюры не найдено',thumbnailPreviewNotFound:'Область предпросмотра миниатюры не найдена',thumbnailPlaceholderNotFound:'Плейсхолдер миниатюры не найден',downloadTargetInvalid:'Недопустимая цель загрузки',downloadTargetNotFound:'Не удалось проверить цель загрузки',downloadNotFile:'Цель загрузки не является обычным файлом',downloadNotAvailable:'Этот элемент недоступен для загрузки',downloadStart:'Загрузка файла начата',downloadComplete:'Загрузка файла завершена',downloadUrlReleaseFailed:'Не удалось освободить URL загрузки',downloadStarted:'Загрузка начата',downloadFailed:'Ошибка загрузки: {error}',uploadContainerNotFound:'Контейнер загрузки не найден',fileAdded:'Файл добавлен',fileAddFailed:'Не удалось добавить файл: {error}',fileAddSuccess:'Файл успешно добавлен',fileAddError:'Ошибка добавления файла',itemOpenNoLink:'Нет ссылки для открытия',itemDeleteConfirm:'Удалить "{label}". Также переместить в корзину Google Drive.',memoIdNotFound:'ID заметки не найден',memoFetchFailed:'Не удалось получить содержимое заметки',memoFetchError:'Не удалось загрузить заметку: {error}',memoFetchComplete:'Содержимое заметки получено: {count} элементов',managerFetchSuccess:'Получение менеджера успешно',managerCacheFallback:'Отображение свежих данных из-за ошибки получения с сервера',managerCacheFallbackMsg:'Не удалось получить последнюю информацию, отображение временно сохранено',managerOpenFailed:'Не удалось открыть проект: {error}',notProjectOwner:'Вы не являетесь создателем этого проекта',urlProtocolRequired:'Введите URL с http:// или https://',domInitFailed:'Инициализация DOM не удалась',domInitComplete:'Инициализация DOM завершена',missingDom:'Отсутствует обязательный DOM: {key}',viewNotFound:'Вид не найден: {key}',viewChanged:'Вид: {name}',overlayNotFound:'Оверлей обработки не найден',progressFadeComplete:'Прогресс затухание завершено',progressShown:'Прогресс отображен: {message}',driveSessionSaved:'Сессия Drive сохранена',driveSessionCleared:'Сессия Drive очищена',driveSessionRestored:'Восстановлена сохраненная сессия Drive',driveGrantSaved:'Состояние разрешения Google Drive сохранено',driveGrantSaveFailed:'Ошибка сохранения состояния разрешения Drive',driveGisLoaded:'Google Identity Services загружены',driveGisApiUnavailable:'API Google Identity Services недоступен',driveGisLoadFailed:'Ошибка загрузки Google Identity Services',driveTokenClientInit:'Google Drive Token Client инициализирован',driveTokenMissing:'Не удалось получить токен доступа Google Drive',driveTokenError:'Ошибка получения токена доступа Google Drive',driveTokenSuccess:'Токен доступа Google Drive получен',driveUserTokenMissing:'Токен доступа отсутствует при получении информации о пользователе Drive',driveUserSuccess:'Информация о пользователе Google Drive получена',driveUserFailed:'Ошибка получения информации о пользователе Google Drive',driveSessionValidated:'Сохраненная сессия Drive проверена',driveRedirectToProjects:'Переход к списку проектов после проверки сохраненного подключения Drive',driveAutoRedirect:'Автоматический переход к списку проектов после подключения/авторизации Drive',driveFetchFailed:'Ошибка получения списка проектов после подключения к Drive',driveConnectStart:'Начало подключения Google Drive: interactive={interactive}, force={force}',driveTokenRequest:'Запрос токена доступа Drive: interactive={interactive}, prompt={prompt}',driveTokenRequestFailed:'Ошибка начала запроса токена доступа Drive',driveConnectUserStart:'Начало подключения Drive через действие пользователя',driveConnectUserSuccess:'Подключение Drive через действие пользователя завершено',driveConnectUserFailed:'Ошибка подключения Drive через действие пользователя',apiJsonParseFailed:'Ошибка парсинга JSON-ответа',api401NoAutoOAuth:'Worker вернул 401, автоматический OAuth не выполняется, отображается кнопка подключения Drive',api401AuthRequired:'Состояние требования аутентификации Drive отражено в UI',projectListEmpty:'Список проектов: 0 элементов',projectListCount:'Список проектов: {count} элементов',projectListFetched:'Список проектов получен: {count} элементов',projectFetchFailed:'Ошибка получения списка проектов',projectCreateSuccess:'Создание проекта успешно',projectCreateFailed:'Ошибка создания проекта',itemCount:'Элементы: {count}',memoIdNotFound:'ID заметки не найден',memoFetchFailed:'Не удалось получить содержимое заметки',memoFetchComplete:'Содержимое заметки получено: {count} элементов',managerFetchSuccess:'Получение менеджера успешно',managerCacheFallback:'Отображение свежих данных из-за ошибки получения с сервера',downloadComplete:'Загрузка файла завершена',downloadUrlReleaseFailed:'Не удалось освободить URL загрузки',fileAddSuccess:'Файл успешно добавлен',fileAddFailed:'Ошибка добавления файла',downloadStart:'Загрузка файла начата',snackbarMessage:'Snackbar: {message}',snackbarError:'Snackbar: {message}',headerUpdate:'Обновление заголовка: driveReady={driveReady}, driveNeedsConnection={driveNeedsConnection}, email={email}',shareLoading:'Получение настроек совместного использования…',shareEmpty:'Нет совместного использования.',shareUser:'Совместно используемый пользователь',shareRole:'Зритель',shareRemoveAria:'Удалить совместное использование',publicEmpty:'В этом проекте еще нет элементов.',publicMemoError:'Невозможно отобразить эту заметку.',publicHomeAria:'К списку проектов',publicManage:'Режим редактирования',publicMeta:'{count} элементов',driveSessionRequired:'Требуется подключение к Drive. Подключитесь через "Подключить Drive" в заголовке.',driveAuthFail:'Ошибка аутентификации Drive на странице совместного использования. Автоматический OAuth не выполняется.',publicProjectFetchFailed:'Ошибка получения общего проекта',publicProjectLoaded:'Общий проект JSON получен',publicMemoLoaded:'Содержимое общей заметки получено',publicMemoFetchFailed:'Ошибка получения содержимого общей заметки',thumbnailQueued:'Миниатюра добавлена в очередь',thumbnailFallback:'Резервная миниатюра зарегистрирована',thumbnailLoadError:'Ошибка загрузки элемента img миниатюры',thumbnailDirectFailed:'Резервный вариант Drive thumbnailLink также не удался',thumbnailDecodeError:'Ошибка декодирования изображения миниатюры, возвращенного Worker',thumbnailAuthFallback:'Попытка прямого использования thumbnailLink из-за ошибки аутентификации Worker',thumbnailAuthStop:'Остановка получения миниатюры через Worker из-за прав Drive',thumbnailNoConditions:'Условия регистрации миниатюры не выполнены',thumbnailDomNotConnected:'Регистрация миниатюры отклонена до подключения DOM',thumbnailError:'Ошибка получения миниатюры. Отображение иконки.',thumbnailRetry:'Повторная попытка получения миниатюры Drive',thumbnailStateLoaded:'Отображение миниатюры успешно',staticEvents:'Статические события зарегистрированы',initComplete:'Инициализация Files Taco завершена',initFailed:'Ошибка инициализации Files Taco',startupNoOAuth:'Всплывающее окно OAuth Google Drive не открывается при запуске',projectListLoading:'Загрузка списка проектов…',publicPageLoading:'Загрузка страницы просмотра…',shareSettingFetchFailed:'Ошибка получения настроек совместного использования',shareFetchFailed:'Не удалось получить настройки совместного использования',shareAdded:'Поделился {email}',shareSuccess:'Совместное использование успешно',shareFailed:'Ошибка совместного использования',shareUrlCopyFailed:'Ошибка копирования ссылки для совместного использования',shareUrlCopied:'Ссылка для совместного использования скопирована',shareLinkDisplayFailed:'Не удалось отобразить ссылку для совместного использования',shareLinkDialogShown:'Диалог ссылки для совместного использования отображен',shareLinkSelectFailed:'Ошибка выбора поля ввода ссылки для совместного использования',shareLinkEmpty:'Целевая ссылка для копирования пуста',shareLinkNoDom:'DOM для копирования ссылки не найден',shareLinkNoDom2:'Отсутствует обязательный DOM для диалога ссылки',projectIdMissing:'ID проекта отсутствует для отображения ссылки',ownerNotAllowed:'Не владелец, кнопка режима редактирования не отображается',publicItemsNotFound:'Контейнер общих элементов не найден',driveUserMissing:'Токен доступа отсутствует при получении информации о пользователе Drive',driveTokenMissing2:'Не удалось получить токен доступа Google Drive',driveTokenError2:'Ошибка получения токена доступа Google Drive',driveTokenSuccess2:'Токен доступа Google Drive получен',driveGisError:'API Google Identity Services недоступен',driveGisLoadError:'Ошибка загрузки Google Identity Services',driveTokenClientInit2:'Google Drive Token Client инициализирован',driveSessionLoadFailed:'Ошибка загрузки сессии Drive',driveSessionDeleteFailed:'Ошибка удаления сессии Drive',driveGrantSaveFailed2:'Ошибка сохранения состояния разрешения Drive',driveGrantLoadFailed:'Ошибка загрузки состояния разрешения Drive',driveSessionSave:'Сессия Drive сохранена',driveSessionClear:'Сессия Drive очищена',driveSessionRestore:'Восстановлена сохраненная сессия Drive',driveGrantSave:'Состояние разрешения Google Drive сохранено',driveConnectVerified:'Сохраненная сессия Drive проверена',driveConnectRedirect:'Переход к списку проектов после проверки сохраненного подключения Drive',driveConnectAutoRedirect:'Автоматический переход к списку проектов после подключения/авторизации Drive',driveConnectFetchFailed:'Ошибка получения списка проектов после подключения к Drive',driveConnectStart2:'Начало подключения Google Drive: interactive={interactive}, force={force}',driveTokenRequest2:'Запрос токена доступа Drive: interactive={interactive}, prompt={prompt}',driveTokenRequestFailed2:'Ошибка начала запроса токена доступа Drive',driveConnectUserStart2:'Начало подключения Drive через действие пользователя',driveConnectUserSuccess2:'Подключение Drive через действие пользователя завершено',driveConnectUserFailed2:'Ошибка подключения Drive через действие пользователя',api401NoAutoOAuth2:'Worker вернул 401, автоматический OAuth не выполняется, отображается кнопка подключения Drive',api401AuthRequired2:'Состояние требования аутентификации Drive отражено в UI',projectListEmpty2:'Список проектов: 0 элементов',projectListCount2:'Список проектов: {count} элементов',projectListFetched2:'Список проектов получен: {count} элементов',projectFetchFailed2:'Ошибка получения списка проектов',projectCreateSuccess2:'Создание проекта успешно',projectCreateFailed2:'Ошибка создания проекта',itemCount2:'Элементы: {count}',memoIdNotFound2:'ID заметки не найден',memoFetchFailed2:'Не удалось получить содержимое заметки',memoFetchComplete2:'Содержимое заметки получено: {count} элементов',managerFetchSuccess2:'Получение менеджера успешно',managerCacheFallback2:'Отображение свежих данных из-за ошибки получения с сервера',downloadComplete2:'Загрузка файла завершена',downloadUrlReleaseFailed2:'Не удалось освободить URL загрузки',fileAddSuccess2:'Файл успешно добавлен',fileAddFailed2:'Ошибка добавления файла',downloadStart2:'Загрузка файла начата',snackbarMessage2:'Snackbar: {message}',snackbarError2:'Snackbar: {message}',headerUpdate2:'Обновление заголовка: driveReady={driveReady}, driveNeedsConnection={driveNeedsConnection}, email={email}'};</script>
+  <script type="module" src="../src/files-taco//app.js"></script>
+</body>
+</html>
