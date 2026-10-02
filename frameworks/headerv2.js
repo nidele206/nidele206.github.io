@@ -131,7 +131,7 @@ const I18N = {
     header: {
       products: "제품",
       firstGoal: "Nidele",
-      support: "지원과 정보",
+      support: "지원및 정보",
       menu: "메뉴",
       close: "닫기",
       back: "뒤로",
@@ -153,7 +153,7 @@ const I18N = {
         ]
       },
       support: {
-        title: "지원과 정보",
+        title: "지원및 정보",
         items: [
           "지원",
           "봉사자용 원시 프로그람",
